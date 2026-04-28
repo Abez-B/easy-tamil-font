@@ -1,64 +1,160 @@
+/* ============================================================
+   Google Fonts — Inter for UI (must be first, before @tailwind)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   CSS Custom Properties — Light & Dark
+   ============================================================ */
 :root {
-  --font-tamil: 'system-ui', sans-serif;
+  --font-tamil: 'Noto Sans Tamil', system-ui, sans-serif;
+
+  /* Light mode tokens */
+  --color-bg:            #ffffff;
+  --color-bg-secondary:  #f8f9fa;
+  --color-border:        #e9ecef;
+  --color-text:          #212529;
+  --color-text-secondary:#6c757d;
+  --color-primary:       #1a1a2e;
+  --color-accent:        #4f46e5;
+  --color-accent-hover:  #4338ca;
+}
+
+.dark {
+  --color-bg:            #0f0f1a;
+  --color-bg-secondary:  #1a1a2e;
+  --color-border:        #2a2a3e;
+  --color-text:          #e8e8f0;
+  --color-text-secondary:#9090a8;
+  --color-primary:       #c7c7e8;
+  --color-accent:        #818cf8;
+  --color-accent-hover:  #a5b4fc;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   @apply bg-bg text-text;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+/* ============================================================
+   Custom Scrollbar
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-bg-secondary; }
+::-webkit-scrollbar-thumb { @apply bg-accent rounded-full; }
 
-::-webkit-scrollbar-track {
-  @apply bg-bg-secondary;
-}
+/* ============================================================
+   Component Classes
+   ============================================================ */
 
-::-webkit-scrollbar-thumb {
-  @apply bg-accent rounded-full;
-}
-
-/* Font preview styles */
+/* Font preview box */
 .font-preview {
-  @apply p-4 border border-border rounded-lg bg-bg-secondary;
-  min-height: 100px;
+  @apply p-4 border border-border rounded-xl bg-bg-secondary;
+  min-height: 80px;
   word-wrap: break-word;
+  line-height: 1.8;
+  transition: border-color 0.2s;
 }
 
-/* Card hover effect */
+/* Font card (gallery item) */
 .font-card {
-  @apply border border-border rounded-lg p-4 bg-bg hover:border-primary transition-colors cursor-pointer;
+  @apply block border border-border rounded-xl p-5 bg-bg
+         hover:border-accent hover:shadow-md
+         transition-all duration-200 cursor-pointer;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Button styles */
+.dark .font-card {
+  @apply hover:shadow-accent/10;
+}
+
+/* Primary button */
 .btn-primary {
-  @apply px-4 py-2 bg-primary text-white rounded hover:bg-accent transition-colors;
+  @apply px-4 py-2 bg-accent text-white rounded-lg font-medium
+         hover:bg-accent/90 active:scale-[0.98]
+         transition-all duration-150;
 }
 
+/* Secondary button */
 .btn-secondary {
-  @apply px-4 py-2 border border-primary text-primary rounded hover:bg-bg-secondary transition-colors;
+  @apply px-4 py-2 border border-border rounded-lg text-text-secondary font-medium
+         hover:border-accent hover:text-primary
+         active:scale-[0.98]
+         transition-all duration-150;
 }
 
-/* Input styles */
+/* Input / textarea / select */
 .input-field {
-  @apply w-full px-4 py-2 border border-border rounded focus:outline-none focus:border-primary;
+  @apply w-full px-4 py-2.5 border border-border rounded-lg bg-bg text-text
+         placeholder-text-secondary
+         focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent
+         transition-all duration-150;
 }
 
-/* Badge styles */
+/* Badge */
 .badge {
-  @apply px-2 py-1 text-xs rounded-full bg-bg-secondary text-text-secondary;
+  @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium
+         rounded-full bg-bg-secondary text-text-secondary;
 }
 
 .badge-unicode {
-  @apply bg-blue-100 text-blue-800;
+  @apply bg-indigo-100 text-indigo-700;
+}
+
+.dark .badge-unicode {
+  @apply bg-indigo-950 text-indigo-300;
 }
 
 .badge-tace16 {
-  @apply bg-green-100 text-green-800;
+  @apply bg-emerald-100 text-emerald-700;
+}
+
+.dark .badge-tace16 {
+  @apply bg-emerald-950 text-emerald-300;
+}
+
+/* Skeleton shimmer for loading states */
+.skeleton {
+  @apply bg-bg-secondary rounded-lg animate-pulse;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   Tailwind colour alias overrides (map CSS vars → Tailwind)
+   ============================================================ */
+@layer base {
+  .bg-bg            { background-color: var(--color-bg); }
+  .bg-bg-secondary  { background-color: var(--color-bg-secondary); }
+  .border-border    { border-color: var(--color-border); }
+  .text-text        { color: var(--color-text); }
+  .text-text-secondary { color: var(--color-text-secondary); }
+  .text-primary     { color: var(--color-primary); }
+  .bg-primary       { background-color: var(--color-primary); }
+  .bg-accent        { background-color: var(--color-accent); }
+  .text-accent      { color: var(--color-accent); }
+  .border-accent    { border-color: var(--color-accent); }
 }

@@ -1,12 +1,23 @@
 import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
-import copyToClipboard from 'copy-to-clipboard';
 
 export default function CopyButton({ text, fontName }) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    copyToClipboard(text);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // fallback for older browsers
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -19,7 +30,7 @@ export default function CopyButton({ text, fontName }) {
     >
       {copied ? (
         <>
-          <Check className="w-4 h-4" />
+          <Check className="w-4 h-4 text-green-600" />
           <span>Copied!</span>
         </>
       ) : (

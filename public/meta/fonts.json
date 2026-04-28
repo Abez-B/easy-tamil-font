@@ -4,12 +4,21 @@
       "id": "tau-barathi",
       "name": "TAU-Barathi",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Classic Tamil Unicode font with traditional styling",
-      "tags": ["unicode", "traditional", "serif"],
+      "tags": [
+        "unicode",
+        "traditional",
+        "serif"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-barathi/Regular.ttf"
@@ -18,12 +27,21 @@
       "id": "tau-kabilar",
       "name": "TAU-Kabilar",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Modern Tamil font with clean readability",
-      "tags": ["unicode", "modern", "sans-serif"],
+      "tags": [
+        "unicode",
+        "modern",
+        "sans-serif"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-kabilar/Regular.ttf"
@@ -32,12 +50,21 @@
       "id": "tau-kambar",
       "name": "TAU-Kambar",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Elegant Tamil font inspired by the poet Kambar",
-      "tags": ["unicode", "elegant", "serif"],
+      "tags": [
+        "unicode",
+        "elegant",
+        "serif"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-kambar/Regular.ttf"
@@ -46,12 +73,21 @@
       "id": "tau-valluvar",
       "name": "TAU-Valluvar",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Traditional Tamil font honoring Thiruvalluvar",
-      "tags": ["unicode", "traditional", "classic"],
+      "tags": [
+        "unicode",
+        "traditional",
+        "classic"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-valluvar/Regular.ttf"
@@ -60,12 +96,21 @@
       "id": "tau-kaveri",
       "name": "TAU-Kaveri",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Flowing Tamil font with graceful curves",
-      "tags": ["unicode", "flowing", "graceful"],
+      "tags": [
+        "unicode",
+        "flowing",
+        "graceful"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-kaveri/Regular.ttf"
@@ -74,12 +119,20 @@
       "id": "tau-marutham",
       "name": "TAU-Marutham",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Tamil font inspired by Marutham landscape",
-      "tags": ["unicode", "landscape", "nature"],
+      "tags": [
+        "unicode",
+        "landscape",
+        "nature"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-marutham/Regular.ttf"
@@ -88,12 +141,20 @@
       "id": "tau-ezhil",
       "name": "TAU-Ezhil",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Beautiful and elegant Tamil font",
-      "tags": ["unicode", "beautiful", "elegant"],
+      "tags": [
+        "unicode",
+        "beautiful",
+        "elegant"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-ezhil/Regular.ttf"
@@ -102,12 +163,20 @@
       "id": "tau-kurinji",
       "name": "TAU-Kurinji",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Tamil font inspired by Kurinji landscape",
-      "tags": ["unicode", "landscape", "hill"],
+      "tags": [
+        "unicode",
+        "landscape",
+        "hill"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-kurinji/Regular.ttf"
@@ -116,12 +185,20 @@
       "id": "tau-mullai",
       "name": "TAU-Mullai",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Tamil font inspired by Mullai forest landscape",
-      "tags": ["unicode", "landscape", "forest"],
+      "tags": [
+        "unicode",
+        "landscape",
+        "forest"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-mullai/Regular.ttf"
@@ -130,12 +207,20 @@
       "id": "tau-paalai",
       "name": "TAU-Paalai",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Tamil font inspired by Paalai wasteland landscape",
-      "tags": ["unicode", "landscape", "desert"],
+      "tags": [
+        "unicode",
+        "landscape",
+        "desert"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-paalai/Regular.ttf"
@@ -144,12 +229,20 @@
       "id": "tau-urai",
       "name": "TAU-Urai",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Clear and readable Tamil font",
-      "tags": ["unicode", "clear", "readable"],
+      "tags": [
+        "unicode",
+        "clear",
+        "readable"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-urai/Regular.ttf"
@@ -158,12 +251,19 @@
       "id": "tau-achu",
       "name": "TAU-Achu",
       "category": "Unicode",
-      "variants": ["Regular", "Italic"],
+      "variants": [
+        "Regular",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Simple and clean Tamil font",
-      "tags": ["unicode", "simple", "clean"],
+      "tags": [
+        "unicode",
+        "simple",
+        "clean"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-achu/Regular.ttf"
@@ -172,12 +272,20 @@
       "id": "tau-malar",
       "name": "TAU-Malar",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Floral and beautiful Tamil font",
-      "tags": ["unicode", "floral", "beautiful"],
+      "tags": [
+        "unicode",
+        "floral",
+        "beautiful"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-malar/Regular.ttf"
@@ -186,12 +294,20 @@
       "id": "tau-neythal",
       "name": "TAU-Neythal",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Tamil font inspired by Neythal coastal landscape",
-      "tags": ["unicode", "landscape", "coastal"],
+      "tags": [
+        "unicode",
+        "landscape",
+        "coastal"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-neythal/Regular.ttf"
@@ -200,12 +316,20 @@
       "id": "tau-nilavu",
       "name": "TAU-Nilavu",
       "category": "Unicode",
-      "variants": ["Regular", "Bold", "Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "Atmospheric Tamil font with sky-inspired design",
-      "tags": ["unicode", "atmospheric", "sky"],
+      "tags": [
+        "unicode",
+        "atmospheric",
+        "sky"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tau-nilavu/Regular.ttf"
@@ -214,12 +338,21 @@
       "id": "tac-barathi",
       "name": "TAC-Barathi",
       "category": "TACE16",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "TACE16 encoding Tamil font - Barathi",
-      "tags": ["tace16", "traditional", "legacy"],
+      "tags": [
+        "tace16",
+        "traditional",
+        "legacy"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-barathi/Regular.ttf"
@@ -228,12 +361,21 @@
       "id": "tac-kabilar",
       "name": "TAC-Kabilar",
       "category": "TACE16",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "TACE16 encoding Tamil font - Kabilar",
-      "tags": ["tace16", "modern", "legacy"],
+      "tags": [
+        "tace16",
+        "modern",
+        "legacy"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-kabilar/Regular.ttf"
@@ -242,12 +384,21 @@
       "id": "tac-kambar",
       "name": "TAC-Kambar",
       "category": "TACE16",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "TACE16 encoding Tamil font - Kambar",
-      "tags": ["tace16", "elegant", "legacy"],
+      "tags": [
+        "tace16",
+        "elegant",
+        "legacy"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-kambar/Regular.ttf"
@@ -256,12 +407,21 @@
       "id": "tac-valluvar",
       "name": "TAC-Valluvar",
       "category": "TACE16",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "TACE16 encoding Tamil font - Valluvar",
-      "tags": ["tace16", "traditional", "legacy"],
+      "tags": [
+        "tace16",
+        "traditional",
+        "legacy"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-valluvar/Regular.ttf"
@@ -270,12 +430,21 @@
       "id": "tac-kaveri",
       "name": "TAC-Kaveri",
       "category": "TACE16",
-      "variants": ["Regular", "Bold", "Italic", "Bold Italic"],
+      "variants": [
+        "Regular",
+        "Bold",
+        "Italic",
+        "Bold Italic"
+      ],
       "author": "Tamil Virtual Academy",
       "license": "Free for educational and research use",
       "source": "https://www.tamilvu.org/ta/tkbd-index-341488",
       "description": "TACE16 encoding Tamil font - Kaveri",
-      "tags": ["tace16", "flowing", "legacy"],
+      "tags": [
+        "tace16",
+        "flowing",
+        "legacy"
+      ],
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-kaveri/Regular.ttf"
@@ -284,17 +453,14 @@
   "categories": [
     {
       "name": "Unicode",
-      "description": "Tamil Unicode fonts (standard)",
-      "count": 15
+      "description": "Tamil Unicode fonts (standard encoding)"
     },
     {
       "name": "TACE16",
-      "description": "TACE16 alternate standard fonts",
-      "count": 5
+      "description": "TACE16 alternate standard fonts (legacy encoding)"
     }
   ],
   "metadata": {
-    "totalFonts": 20,
     "lastUpdated": "2026-04-29",
     "source": "Tamil Virtual Academy",
     "disclaimer": "Fonts are exclusively for educational and research purposes"
