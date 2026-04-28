@@ -23,9 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Font files (add fonts separately)
-public/fonts/*/
-!public/fonts/.gitkeep
+# Keep .gitkeep if needed, but track actual font files
+!public/fonts/**/*.ttf
+!public/fonts/**/*.otf
 
 # Environment variables
 .env
