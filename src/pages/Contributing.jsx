@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Github, FileJson, FolderPlus } from 'lucide-react';
+import { ArrowLeft, FileJson, FolderPlus } from 'lucide-react';
 
 export default function Contributing() {
   return (
@@ -104,10 +104,7 @@ export default function Contributing() {
                 <div className="flex items-start space-x-3">
                   <span className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-semibold">6</span>
                   <div>
-                    <h3 className="font-semibold text-primary mb-1 flex items-center">
-                      <Github className="w-5 h-5 mr-2" />
-                      Create Pull Request
-                    </h3>
+                    <h3 className="font-semibold text-primary mb-1">Create Pull Request</h3>
                     <p className="text-text-secondary">
                       Go to the original repository and create a Pull Request. Include a detailed 
                       description of the font you're adding.
