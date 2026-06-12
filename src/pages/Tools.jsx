@@ -6,158 +6,75 @@ import {
 } from 'lucide-react';
 import { useFontsData } from '../hooks/useFontsData';
 import { romanize } from 'tamil-romanizer';
+import { createEngine, tamilConfig } from '@piraisoodan/tanglish';
 
-// ─────────────────────────────────────────────────────────────────
-// 1A. TANGLISH → TAMIL  (fixed syllable-based engine)
-// ─────────────────────────────────────────────────────────────────
-// Consonant rules: [tanglish_pattern, tamil_base_without_pulli]
-// Ordered LONGEST first. Matched case-sensitively.
-const CONS_RULES = [
-  // 3-char clusters
-  ['ksh', 'க்ஷ'], ['Ksh', 'க்ஷ'], ['KSH', 'க்ஷ'],
-  // 2-char true clusters
-  ['ng',  'ங'], ['NG',  'ங'],
-  ['nj',  'ஞ'], ['NJ',  'ஞ'],
-  ['nh',  'ண'],
-  ['nd',  'ந'],
-  ['ch',  'ச'], ['Ch',  'ச'], ['CH',  'ச'],
-  ['sh',  'ஷ'], ['Sh',  'ஷ'], ['SH',  'ஷ'],
-  ['zh',  'ழ'], ['Zh',  'ழ'], ['ZH',  'ழ'],
-  ['th',  'த'], ['TH',  'த'],
-  ['Th',  'ட'],
-  ['dh',  'த'], ['DH',  'த'],
-  ['Dh',  'ட'],
-  ['bh',  'ப'], ['Bh',  'ப'], ['BH',  'ப'],
-  ['gh',  'க'], ['Gh',  'க'],
-  ['ph',  'ப'], ['Ph',  'ப'],
-  ['kh',  'க'], ['Kh',  'க'],
-  // rr/RR → ற (hard Tamil R — very common convention)
-  ['rr',  'ற'], ['RR',  'ற'],
-  // NOTE: 'll' is intentionally NOT a cluster; treated as double-l → ல்ல
-  // 1-char consonants
-  ['k', 'க'], ['K', 'க'],
-  ['g', 'க'], ['G', 'க'],
-  ['c', 'ச'], ['C', 'ச'],
-  ['s', 'ஸ'],
-  ['S', 'ஷ'],
-  ['j', 'ஜ'], ['J', 'ஜ'],
-  ['t', 'ட'],   // retroflex ட (lowercase t)
-  ['T', 'த'],   // dental த (uppercase T)
-  ['d', 'ட'], ['D', 'ட'],
-  ['n', 'ந'],   // dental ந
-  ['N', 'ண'],   // retroflex ண (uppercase N)
-  ['p', 'ப'], ['P', 'ப'],
-  ['b', 'ப'], ['B', 'ப'],
-  ['f', 'ப'], ['F', 'ப'],
-  ['m', 'ம'], ['M', 'ம'],
-  ['y', 'ய'], ['Y', 'ய'],
-  ['r', 'ர'],
-  ['R', 'ற'],   // hard ற (uppercase R)
-  ['l', 'ல'],
-  ['L', 'ள'],   // retroflex ள (uppercase L)
-  ['v', 'வ'], ['V', 'வ'],
-  ['w', 'வ'], ['W', 'வ'],
-  ['z', 'ழ'], ['Z', 'ழ'],
-  ['h', 'ஹ'], ['H', 'ஹ'],
-  ['x', 'க்ஸ'],
-  ['q', 'க'], ['Q', 'க'],
-];
+const customConfig = {
+  ...tamilConfig,
+  overrides: [
+    ['ZH', 'ழ்'],
+    ['Zh', 'ழ்'],
+    
+    // t -> த mappings
+    ['t', 'த்'],
+    ['ta', 'த'], ['tA', 'தா'], ['taa', 'தா'], ['ti', 'தி'], ['tI', 'தீ'], ['tii', 'தீ'], ['tu', 'து'], ['tU', 'தூ'], ['tuu', 'தூ'], ['te', 'தெ'], ['tE', 'தே'], ['tee', 'தே'], ['to', 'தொ'], ['tO', 'தோ'], ['too', 'தோ'], ['tai', 'தை'], ['tau', 'தௌ'],
+    
+    // d -> த mappings
+    ['d', 'த்'],
+    ['da', 'த'], ['dA', 'தா'], ['daa', 'தா'], ['di', 'தி'], ['dI', 'தீ'], ['dii', 'தீ'], ['du', 'து'], ['dU', 'தூ'], ['duu', 'தூ'], ['de', 'தெ'], ['dE', 'தே'], ['dee', 'தே'], ['do', 'தொ'], ['dO', 'தோ'], ['doo', 'தோ'], ['dai', 'தை'], ['dau', 'தௌ'],
 
-// Vowel rules: [tanglish, standalone, matra]
-// Ordered LONGEST first. Matched case-insensitively.
-const VOW_RULES = [
-  ['aa', 'ஆ', 'ா'],
-  ['ii', 'ஈ', 'ீ'],
-  ['ee', 'ஏ', 'ே'],
-  ['uu', 'ஊ', 'ூ'],
-  ['oo', 'ஓ', 'ோ'],
-  ['ai', 'ஐ', 'ை'],
-  ['au', 'ஔ', 'ௌ'],
-  ['a',  'அ', ''],
-  ['i',  'இ', 'ி'],
-  ['u',  'உ', 'ு'],
-  ['e',  'எ', 'ெ'],
-  ['o',  'ஒ', 'ொ'],
-];
+    // T -> ட mappings
+    ['T', 'ட்'],
+    ['Ta', 'ட'], ['TA', 'டா'], ['Taa', 'டா'], ['Ti', 'டி'], ['TI', 'டீ'], ['Tii', 'டீ'], ['Tu', 'டு'], ['TU', 'டூ'], ['Tuu', 'டூ'], ['Te', 'டெ'], ['TE', 'டே'], ['Tee', 'டே'], ['To', 'டொ'], ['TO', 'டோ'], ['Too', 'டோ'], ['Tai', 'டை'], ['Tau', 'டௌ'],
 
-const PULLI = '்';
+    // D -> ட mappings
+    ['D', 'ட்'],
+    ['Da', 'ட'], ['DA', 'டா'], ['Daa', 'டா'], ['Di', 'டி'], ['DI', 'டீ'], ['Dii', 'டீ'], ['Du', 'டு'], ['DU', 'டூ'], ['Duu', 'டூ'], ['De', 'டெ'], ['DE', 'டே'], ['Dee', 'டே'], ['Do', 'டொ'], ['DO', 'டோ'], ['Doo', 'டோ'], ['Dai', 'டை'], ['Dau', 'டௌ'],
 
-function tanglishToTamil(text) {
-  let out = '';
-  let i = 0;
-  let wordStart = true; // true at start and after any non-alpha character
+    // ss -> ஸ mappings
+    ['ss', 'ஸ்'],
+    ['ssa', 'ஸ'], ['ssA', 'ஸா'], ['ssaa', 'ஸா'], ['ssi', 'ஸி'], ['ssI', 'ஸீ'], ['ssii', 'ஸீ'], ['ssu', 'ஸு'], ['ssU', 'ஸூ'], ['ssuu', 'ஸூ'], ['sse', 'ஸெ'], ['ssE', 'ஸே'], ['ssee', 'ஸே'], ['sso', 'ஸொ'], ['ssO', 'ஸோ'], ['ssoo', 'ஸோ'], ['ssai', 'ஸை'], ['ssau', 'ஸௌ'],
 
-  while (i < text.length) {
-    const ch = text[i];
+    // S -> ஷ mappings
+    ['S', 'ஷ்'],
+    ['Sa', 'ஷ'], ['SA', 'ஷா'], ['Saa', 'ஷா'], ['Si', 'ஷி'], ['SI', 'ஷீ'], ['Sii', 'ஷீ'], ['Su', 'ஷு'], ['SU', 'ஷூ'], ['Suu', 'ஷூ'], ['Se', 'ஷெ'], ['SE', 'ஷே'], ['See', 'ஷே'], ['So', 'ஷொ'], ['SO', 'ஷோ'], ['Soo', 'ஷோ'], ['Sai', 'ஷை'], ['Sau', 'ஷௌ'],
 
-    // Pass through non-alpha — space/punctuation resets word boundary
-    if (!/[a-zA-Z]/.test(ch)) {
-      out += ch;
-      i++;
-      wordStart = true;
-      continue;
-    }
+    ...(tamilConfig.overrides || [])
+  ]
+};
 
-    // Try consonant match — case-sensitive, longest first
-    let consBase = null, consLen = 0, consKey = null;
-    for (const [pat, base] of CONS_RULES) {
-      if (text.startsWith(pat, i)) {
-        consBase = base;
-        consLen = pat.length;
-        consKey = pat;
-        break;
-      }
-    }
-
-    if (consBase !== null) {
-      // Context-sensitive 'n': word-initial → ந (dental), medial → ன (alveolar)
-      // Capital N always stays as ண (retroflex) — handled by CONS_RULES ordering
-      if (consKey === 'n' && !wordStart) {
-        consBase = 'ன';
-      }
-
-      i += consLen;
-      wordStart = false;
-
-      // Try vowel immediately after — case-insensitive
-      const rest = text.slice(i).toLowerCase();
-      let vowMatra = null, vowLen = 0;
-      for (const [vPat, , vMatra] of VOW_RULES) {
-        if (rest.startsWith(vPat)) {
-          vowMatra = vMatra;
-          vowLen = vPat.length;
-          break;
-        }
-      }
-      out += vowMatra !== null
-        ? consBase + vowMatra
-        : consBase + PULLI;
-      if (vowMatra !== null) i += vowLen;
-      continue;
-    }
-
-    // Try standalone vowel — case-insensitive
-    const rest = text.slice(i).toLowerCase();
-    let matched = false;
-    for (const [vPat, vStand] of VOW_RULES) {
-      if (rest.startsWith(vPat)) {
-        out += vStand;
-        i += vPat.length;
-        matched = true;
-        wordStart = false;
-        break;
-      }
-    }
-    if (!matched) { out += ch; i++; wordStart = false; }
-  }
-
-  // Post-processing: nasal assimilation before velar stops
-  // ன (medial n) + optional vowel matra + க → ண (retroflex nasal before velar)
-  // e.g. வன + க்கம் → வணக்கம்
-  out = out.replace(/ன([ாிீுூெேைொோௌ]?)க/g, 'ண$1க');
-
-  return out;
+// Add custom dictionary entries
+if (customConfig.dictionary) {
+  customConfig.dictionary['tamilnadu'] = 'தமிழ்நாடு';
+  customConfig.dictionary['mudal'] = 'முதல்';
+  customConfig.dictionary['idam'] = 'இடம்';
+  customConfig.dictionary['kuriyeettil'] = 'குறியீட்டில்';
+  customConfig.dictionary['kuriyeedu'] = 'குறியீடு';
+  customConfig.dictionary['puvisaar'] = 'புவிசார்';
 }
+
+// Customize vowel signs so 'ee' maps to 'ீ' (long-i)
+if (customConfig.vowelSigns) {
+  const newVowelSigns = [...customConfig.vowelSigns];
+  const eeIdx = newVowelSigns.findIndex(p => p[0] === 'ee');
+  if (eeIdx !== -1) {
+    newVowelSigns[eeIdx] = ['ee', 'ீ'];
+  }
+  customConfig.vowelSigns = newVowelSigns;
+}
+
+const tanglishEngine = createEngine(customConfig);
+
+// ─────────────────────────────────────────────────────────────────
+// 1A. TANGLISH → TAMIL  (powered by @piraisoodan/tanglish)
+// ─────────────────────────────────────────────────────────────────
+function tanglishToTamil(text) {
+  try {
+    return tanglishEngine.transliterate(text);
+  } catch {
+    return text;
+  }
+}
+
 
 
 // ─────────────────────────────────────────────────────────────────
@@ -263,30 +180,27 @@ function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style, id 
 const QUICK_TIPS = [
   { key: 'aa',       val: 'ஆ — long A' },
   { key: 'ii / ee',  val: 'ஈ — long I' },
-  { key: 'uu / oo',  val: 'ஊ — long U' },
+  { key: 'uu',       val: 'ஊ — long U' },
+  { key: 'oo',       val: 'ஓ — long O' },
   { key: 'ai',       val: 'ஐ' },
-  { key: 'au',       val: 'ஔ' },
-  { key: 'zh',       val: 'ழ — unique Tamil zh' },
-  { key: 'rr / R',   val: 'ற — hard Tamil R' },
+  { key: 'au / ou',  val: 'ஔ' },
+  { key: 'zh / z',   val: 'ழ — unique Tamil zh' },
+  { key: 'R',        val: 'ற — hard Tamil R' },
   { key: 'L',        val: 'ள — retroflex L' },
   { key: 'N',        val: 'ண — retroflex N' },
-  { key: 'Th',       val: 'ட — retroflex T' },
-  { key: 'th / T',   val: 'த — dental T' },
-  { key: 'sh / Sh',  val: 'ஷ' },
-  { key: 'ch',       val: 'ச' },
-  { key: 'ng',       val: 'ங' },
-  { key: 'nj',       val: 'ஞ' },
-  { key: 'll',       val: 'ல்ல — double L' },
-  { key: 'LL',       val: 'ள்ள — double retroflex L' },
+  { key: 't / d',    val: 'ட — retroflex T/D' },
+  { key: 'th / dh',  val: 'த — dental Th/Dh' },
+  { key: 's',        val: 'ச — soft S/C' },
+  { key: 'S',        val: 'ஸ் — Sanskrit S' },
+  { key: 'sh',       val: 'ஷ — Sanskrit Sh' },
 ];
 
 const EXAMPLES = [
-  { tanglish: 'vanakkam', tamil: 'வணக்கம்', note: '(use N for ண)' },
-  { tanglish: 'vaNakkam', tamil: 'வணக்கம்' },
-  { tanglish: 'tamiZH',   tamil: 'தமிழ்' },
+  { tanglish: 'vanakkam', tamil: 'வணக்கம்' },
+  { tanglish: 'puvisaar kuRiyeettil tamilnadu thaan mudal idam', tamil: 'புவிசார் குறியீட்டில் தமிழ்நாடு தான் முதல் இடம்' },
+  { tanglish: 'tamiZH / tamizh',   tamil: 'தமிழ்' },
   { tanglish: 'nalla',    tamil: 'நல்ல' },
   { tanglish: 'iLLai',    tamil: 'இல்லை' },
-  { tanglish: 'Chennai',  tamil: 'சென்னை' },
 ];
 
 function TransliteratorTool() {
