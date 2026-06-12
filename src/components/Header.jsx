@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Type, Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import faviconUrl from '../assets/easy-tamil-font-favicon.png';
 
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -20,9 +21,16 @@ export default function Header({ darkMode, setDarkMode }) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2" onClick={() => setMobileOpen(false)}>
-            <Type className="w-6 h-6 text-primary dark:text-white" />
-            <span className="text-xl font-bold text-primary dark:text-white">easy-font-tamil</span>
+          <Link to="/" className="flex items-center space-x-3 group" onClick={() => setMobileOpen(false)}>
+            {/* Favicon image with dark mode smart inversion (black turns white, red stays red) */}
+            <div className="relative h-10 w-10 flex items-center justify-center shrink-0">
+              <img 
+                src={faviconUrl} 
+                alt="easy-font-tamil icon" 
+                className="h-full w-full object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105 drop-shadow-sm"
+              />
+            </div>
+            <span className="text-xl font-bold text-gradient hidden sm:inline-block">easy-font-tamil</span>
           </Link>
 
           {/* Desktop nav */}

@@ -116,7 +116,7 @@ export default function FontDetail() {
                       text-gray-900 dark:text-white
                       border-gray-200 dark:border-gray-700
                       placeholder-gray-400 dark:placeholder-gray-500
-                      focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400
+                      focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400
                       transition-colors resize-none
                     "
                   />

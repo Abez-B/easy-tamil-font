@@ -13,32 +13,49 @@
 :root {
   --font-tamil: 'Noto Sans Tamil', system-ui, sans-serif;
 
-  /* Light mode */
+  /* Light mode - Now stark white and black with red accents */
   --color-bg:            #ffffff;
-  --color-bg-secondary:  #f5f5f5;
-  --color-border:        #e0e0e0;
-  --color-text:          #1a1a1a;
-  --color-text-secondary:#6b7280;
-  --color-primary:       #111111;
-  --color-accent:        #5b50e8;
-  --color-accent-hover:  #4338ca;
+  --color-bg-secondary:  #f3f4f6;
+  --color-border:        #e5e7eb;
+  --color-text:          #000000;
+  --color-text-secondary:#4b5563;
+  --color-primary:       #000000;
+  --color-accent:        #dc2626; /* Pure red */
+  --color-accent-hover:  #b91c1c;
+
+  /* Red accent colors */
+  --color-red-main:      #dc2626;
+  --color-red-soft:      #fee2e2;
+  --color-red-border:    #fca5a5;
+
+  /* Gradient definitions - Red to Dark Red */
+  --grad-brand:   linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+  --grad-hero-bg: linear-gradient(160deg, #fef2f2 0%, #fff1f2 55%, #ffffff 100%);
 }
 
-/* Dark palette anchored to #161616 */
+/* Dark palette anchored to true black (#000000) instead of dark gray */
 .dark {
-  --color-bg:            #161616;
-  --color-bg-secondary:  #1e1e1e;
-  --color-border:        #333333;
-  --color-text:          #f5f5f5;
-  --color-text-secondary:#a3a3a3;
+  --color-bg:            #000000;
+  --color-bg-secondary:  #111111;
+  --color-border:        #262626;
+  --color-text:          #f9fafb;
+  --color-text-secondary:#9ca3af;
   --color-primary:       #ffffff;
-  --color-accent:        #818cf8;
-  --color-accent-hover:  #a5b4fc;
+  --color-accent:        #ef4444;
+  --color-accent-hover:  #f87171;
+
+  /* Red accent — dark mode */
+  --color-red-main:      #ef4444;
+  --color-red-soft:      #450a0a;
+  --color-red-border:    #7f1d1d;
+
+  /* Gradient definitions — dark (Black to Deep Red) */
+  --grad-brand:   linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%);
+  --grad-hero-bg: linear-gradient(160deg, #0a0000 0%, #000000 55%, #050000 100%);
 }
 
 /* ============================================================
-   Root anchors — apply to every layer of the DOM tree
-   so nothing slips through with a white background
+   Root anchors
    ============================================================ */
 html,
 body,
@@ -47,12 +64,7 @@ body,
   color: var(--color-text);
 }
 
-/* ============================================================
-   Base
-   ============================================================ */
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -61,17 +73,63 @@ body {
 }
 
 /* ============================================================
-   Custom Scrollbar
+   Custom Scrollbar — red thumb
    ============================================================ */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background-color: var(--color-bg-secondary); }
-::-webkit-scrollbar-thumb { background-color: var(--color-accent); border-radius: 9999px; }
+::-webkit-scrollbar-thumb {
+  background: var(--grad-brand);
+  border-radius: 9999px;
+}
 
 /* ============================================================
-   Component Classes — all use CSS vars, never hardcoded colours
+   Hero gradient background
    ============================================================ */
+.hero-section {
+  background: var(--grad-hero-bg);
+  position: relative;
+  overflow: hidden;
+}
 
-/* Font preview box */
+/* Decorative blobs behind hero content */
+.hero-section::before,
+.hero-section::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+/* Red blob — top-left */
+.hero-section::before {
+  width: 380px;
+  height: 380px;
+  top: -120px;
+  left: -80px;
+  background: rgba(220, 38, 38, 0.15); /* Red tinted */
+}
+/* Dark Red blob — bottom-right */
+.hero-section::after {
+  width: 320px;
+  height: 320px;
+  bottom: -80px;
+  right: -60px;
+  background: rgba(153, 27, 27, 0.15); /* Dark Red tinted */
+}
+
+/* ============================================================
+   Gradient text utility
+   ============================================================ */
+.text-gradient {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   Font preview box
+   ============================================================ */
 .font-preview {
   padding: 1rem;
   border: 1px solid var(--color-border);
@@ -83,7 +141,9 @@ body {
   transition: border-color 0.2s;
 }
 
-/* Font card (gallery item) */
+/* ============================================================
+   Font card (gallery item)
+   ============================================================ */
 .font-card {
   display: block;
   border: 1px solid var(--color-border);
@@ -91,24 +151,34 @@ body {
   padding: 1.25rem;
   background-color: var(--color-bg-secondary);
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, transform 0.2s;
   animation: fadeIn 0.3s ease-out;
-}
-.font-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.dark .font-card:hover {
-  box-shadow: 0 4px 20px rgba(124,106,247,0.12);
+  position: relative;
 }
 
-/* Primary button */
+/* gradient border shimmer on hover via box-shadow + border */
+.font-card:hover {
+  border-color: transparent;
+  background-image: linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)),
+                    var(--grad-brand);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 6px 24px rgba(220, 38, 38, 0.15), 0 2px 8px rgba(153, 27, 27, 0.1);
+  transform: translateY(-2px);
+}
+.dark .font-card:hover {
+  box-shadow: 0 6px 28px rgba(239, 68, 68, 0.2), 0 2px 10px rgba(127, 29, 29, 0.15);
+}
+
+/* ============================================================
+   Primary button
+   ============================================================ */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--color-accent);
+  background: var(--grad-brand);
   color: #ffffff;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -117,7 +187,9 @@ body {
 .btn-primary:hover  { opacity: 0.88; }
 .btn-primary:active { transform: scale(0.98); }
 
-/* Secondary button */
+/* ============================================================
+   Secondary button
+   ============================================================ */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -133,7 +205,9 @@ body {
 .btn-secondary:hover  { border-color: var(--color-accent); color: var(--color-primary); }
 .btn-secondary:active { transform: scale(0.98); }
 
-/* Input / textarea / select */
+/* ============================================================
+   Input / textarea / select
+   ============================================================ */
 .input-field {
   width: 100%;
   padding: 0.625rem 1rem;
@@ -150,7 +224,9 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
-/* Badge */
+/* ============================================================
+   Badges
+   ============================================================ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -164,28 +240,31 @@ body {
 }
 
 .badge-unicode {
-  background-color: #e0e7ff;
-  color: #4338ca;
-  border-color: #c7d2fe;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 .dark .badge-unicode {
-  background-color: #1e1b4b;
-  color: #a5b4fc;
-  border-color: #312e81;
+  background-color: #450a0a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
 }
 
+/* TACE16 — distinct dark red styling */
 .badge-tace16 {
-  background-color: #d1fae5;
-  color: #065f46;
-  border-color: #a7f3d0;
+  background-color: #111827;
+  color: #f87171;
+  border-color: #374151;
 }
 .dark .badge-tace16 {
-  background-color: #064e3b;
-  color: #6ee7b7;
-  border-color: #065f46;
+  background-color: #ffffff;
+  color: #dc2626;
+  border-color: #e5e7eb;
 }
 
-/* Skeleton shimmer */
+/* ============================================================
+   Skeleton shimmer
+   ============================================================ */
 .skeleton {
   background-color: var(--color-bg-secondary);
   border-radius: 0.5rem;

@@ -31,22 +31,25 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+      <section className="hero-section border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-18 relative z-10">
           <div className="max-w-2xl">
+
+            {/* Large decorative Tamil text with gradient */}
             <div
-              className="text-5xl md:text-6xl font-bold mb-4 leading-tight text-text dark:text-white"
+              className="text-5xl md:text-6xl font-bold mb-4 leading-tight text-gradient"
               style={{ fontFamily: 'system-ui' }}
               aria-hidden="true"
             >
               {SAMPLE_TAMIL}
             </div>
+
             <h1 className="text-2xl md:text-3xl font-bold text-primary dark:text-gray-100 mb-3">
               Tamil Font Gallery
             </h1>
             <p className="text-text-secondary dark:text-gray-300 text-lg leading-relaxed mb-6">
               Browse and preview{' '}
-              <span className="font-semibold text-accent dark:text-indigo-400">
+              <span className="font-semibold text-gradient">
                 {loading ? '…' : `${fonts.length} Tamil fonts`}
               </span>{' '}
               from Tamil Virtual Academy. Free for educational and research use.
@@ -58,7 +61,7 @@ export default function Home() {
                 {categories.map((cat) => (
                   <span key={cat.name} className="flex items-center gap-1.5">
                     <span className={`w-2 h-2 rounded-full inline-block ${
-                      cat.name === 'Unicode' ? 'bg-indigo-500' : 'bg-emerald-500'
+                      cat.name === 'Unicode' ? 'bg-gray-800 dark:bg-gray-400' : 'bg-red-600'
                     }`} />
                     {cat.count} {cat.name} fonts
                   </span>

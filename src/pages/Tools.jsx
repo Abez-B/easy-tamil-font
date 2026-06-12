@@ -316,7 +316,7 @@ function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style }) {
         text-gray-900 dark:text-white
         border-gray-200 dark:border-gray-700
         placeholder-gray-400 dark:placeholder-gray-500
-        focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400
+        focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400
         transition-colors text-base leading-relaxed"
     />
   );
@@ -354,7 +354,7 @@ function TransliteratorTool() {
             onClick={() => { setMode('tanglish'); setInput(''); }}
             className={`px-4 py-2 font-medium transition-colors ${
               !isTamilMode
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
@@ -364,7 +364,7 @@ function TransliteratorTool() {
             onClick={() => { setMode('tamil'); setInput(''); }}
             className={`px-4 py-2 font-medium transition-colors border-l border-gray-200 dark:border-gray-700 ${
               isTamilMode
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
@@ -383,7 +383,7 @@ function TransliteratorTool() {
         ) : (
           <>Type English phonetics (Tanglish) and see Tamil script instantly.
             <strong className="text-gray-700 dark:text-gray-300"> Example: </strong>
-            <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-400">
+            <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-red-600 dark:text-red-400">
               BhaaraTh
             </code>
             {' → '}
@@ -421,7 +421,7 @@ function TransliteratorTool() {
       {/* Quick reference — only in Tanglish→Tamil mode */}
       {!isTamilMode && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-indigo-600 dark:text-indigo-400
+          <summary className="cursor-pointer text-sm font-medium text-red-600 dark:text-red-400
             hover:underline list-none flex items-center gap-1">
             <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
             Key conventions
@@ -431,7 +431,7 @@ function TransliteratorTool() {
               <div key={key}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg
                   bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm">
-                <code className="font-mono text-indigo-600 dark:text-indigo-400">{key}</code>
+                <code className="font-mono text-red-600 dark:text-red-400">{key}</code>
                 <span className="text-gray-400">→</span>
                 <span className="text-gray-800 dark:text-gray-200">{val}</span>
               </div>
@@ -487,8 +487,8 @@ function UnicodeExplorerTool() {
                     <td className="py-2 pr-4 font-bold text-xl"
                       style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>{char}</td>
                     <td className="py-2 pr-4">
-                      <code className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700
-                        dark:text-indigo-300 px-2 py-0.5 rounded font-mono">{hex}</code>
+                      <code className="bg-red-50 dark:bg-red-900/30 text-red-700
+                        dark:text-red-300 px-2 py-0.5 rounded font-mono">{hex}</code>
                     </td>
                     <td className="py-2 pr-4 text-gray-500 dark:text-gray-400">{codepoint}</td>
                     <td className="py-2">
@@ -512,7 +512,7 @@ function UnicodeExplorerTool() {
       <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           Convert Unicode escapes like <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5
-          rounded text-indigo-600 dark:text-indigo-400">U+0B95</code> to actual characters.
+          rounded text-red-600 dark:text-red-400">U+0B95</code> to actual characters.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -582,7 +582,7 @@ function FontTesterTool() {
               className="w-full appearance-none pl-3 pr-8 py-2 rounded-xl border text-sm
                 bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                 border-gray-200 dark:border-gray-700
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
             >
               {loading
                 ? <option>Loading fonts…</option>
@@ -604,7 +604,7 @@ function FontTesterTool() {
             min={12} max={72} step={2}
             value={fontSize}
             onChange={e => setFontSize(Number(e.target.value))}
-            className="w-full accent-indigo-600"
+            className="w-full accent-red-600"
           />
         </div>
       </div>
@@ -647,8 +647,8 @@ function FontTesterTool() {
       {/* Font metadata badge */}
       {font && (
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40
-            text-indigo-700 dark:text-indigo-300 font-medium">{font.category}</span>
+          <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-900/40
+            text-red-700 dark:text-red-300 font-medium">{font.category}</span>
           <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800
             text-gray-600 dark:text-gray-400">{font.license}</span>
           {font.variants?.length > 0 && (
@@ -661,7 +661,7 @@ function FontTesterTool() {
       {/* Unicode codepoints breakdown */}
       {text.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-indigo-600 dark:text-indigo-400
+          <summary className="cursor-pointer text-sm font-medium text-red-600 dark:text-red-400
             hover:underline list-none flex items-center gap-1">
             <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
             Unicode code points ({[...text].length} chars)
@@ -673,10 +673,10 @@ function FontTesterTool() {
                 title={cp}
                 onClick={() => navigator.clipboard.writeText(cp)}
                 className={`flex flex-col items-center px-2 py-1.5 rounded-lg border cursor-pointer
-                  text-xs transition-colors hover:border-indigo-400 dark:hover:border-indigo-500
+                  text-xs transition-colors hover:border-red-400 dark:hover:border-red-500
                   ${
                     isTamil
-                      ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800'
+                      ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800'
                       : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                   }`}
               >
@@ -755,13 +755,13 @@ export default function Tools() {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
                 transition-all border
                 ${activeTab === id
-                  ? 'bg-indigo-600 dark:bg-indigo-500 text-white border-indigo-600 dark:border-indigo-500 shadow-md'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600'
+                  ? 'bg-red-600 dark:bg-red-500 text-white border-red-600 dark:border-red-500 shadow-md'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600'
                 }`}
             >
               <Icon className="w-4 h-4" />
               <span>{label}</span>
-              <span className={`hidden sm:inline text-xs ${activeTab === id ? 'text-indigo-200' : 'text-gray-400 dark:text-gray-500'}`}>
+              <span className={`hidden sm:inline text-xs ${activeTab === id ? 'text-red-200' : 'text-gray-400 dark:text-gray-500'}`}>
                 — {desc}
               </span>
             </button>
