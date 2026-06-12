@@ -25,8 +25,12 @@ function injectFontFaces(fonts) {
   const rules = fonts
     .filter((f) => f.downloadUrl)
     .map((f) => {
-      const path = f.downloadUrl.replace(/^\//, '');
-      const url = `${BASE}${path}`;
+      // If downloadUrl is already absolute (http/https), use it directly.
+      // Otherwise prefix with BASE as before.
+      const isAbsolute = /^https?:\/\//.test(f.downloadUrl);
+      const url = isAbsolute
+        ? f.downloadUrl
+        : `${BASE}${f.downloadUrl.replace(/^\//, '')}?v=3`;
       return `@font-face {\n  font-family: "${f.name}";\n  src: url("${url}") format("truetype");\n  font-display: swap;\n}`;
     })
     .join('\n\n');

@@ -29,7 +29,7 @@ function App() {
   }, [darkMode]);
 
   return (
-    <Router>
+    <Router basename={import.meta.env.VITE_BASE_PATH || '/'}>
       <div className="min-h-screen flex flex-col">
         <LicenseBanner />
         <Header darkMode={darkMode} setDarkMode={setDarkMode} />

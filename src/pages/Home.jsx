@@ -31,22 +31,22 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="border-b border-border bg-bg-secondary">
+      <section className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
           <div className="max-w-2xl">
             <div
-              className="text-5xl md:text-6xl font-bold mb-4 leading-tight"
+              className="text-5xl md:text-6xl font-bold mb-4 leading-tight text-text dark:text-white"
               style={{ fontFamily: 'system-ui' }}
               aria-hidden="true"
             >
               {SAMPLE_TAMIL}
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-primary dark:text-gray-100 mb-3">
               Tamil Font Gallery
             </h1>
-            <p className="text-text-secondary text-lg leading-relaxed mb-6">
+            <p className="text-text-secondary dark:text-gray-300 text-lg leading-relaxed mb-6">
               Browse and preview{' '}
-              <span className="font-semibold text-accent">
+              <span className="font-semibold text-accent dark:text-indigo-400">
                 {loading ? '…' : `${fonts.length} Tamil fonts`}
               </span>{' '}
               from Tamil Virtual Academy. Free for educational and research use.
@@ -54,7 +54,7 @@ export default function Home() {
 
             {/* Category breakdown — dynamically generated */}
             {!loading && !error && (
-              <div className="flex flex-wrap gap-4 text-sm text-text-secondary">
+              <div className="flex flex-wrap gap-4 text-sm text-text-secondary dark:text-gray-300">
                 {categories.map((cat) => (
                   <span key={cat.name} className="flex items-center gap-1.5">
                     <span className={`w-2 h-2 rounded-full inline-block ${

@@ -2,9 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
+// Base path:
+//   Netlify (default) → '/'
+//   GitHub Pages      → set VITE_BASE_PATH=/easy-font-tamil/ in the CI environment
 export default defineConfig({
   plugins: [react()],
-  // Required for GitHub Pages deployment at /<repo-name>/
-  // Change this to '/' if deploying to a custom domain root
-  base: '/easy-font-tamil/',
+  base: process.env.VITE_BASE_PATH || '/',
 })
+

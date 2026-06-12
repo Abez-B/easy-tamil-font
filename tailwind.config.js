@@ -8,15 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Light mode
-        'bg':            '#ffffff',
-        'bg-secondary':  '#f8f9fa',
-        'border':        '#e9ecef',
-        'text':          '#212529',
-        'text-secondary':'#6c757d',
-        'primary':       '#1a1a2e',
-        'accent':        '#4f46e5',
-        'hover':         '#dee2e6',
+        // All themed colors point to CSS variables so dark mode works.
+        // When .dark is on <html>, the vars update and every Tailwind
+        // utility that uses these colors updates with them.
+        'bg':             'var(--color-bg)',
+        'bg-secondary':   'var(--color-bg-secondary)',
+        'border':         'var(--color-border)',
+        'text':           'var(--color-text)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'primary':        'var(--color-primary)',
+        'accent':         'var(--color-accent)',
+        'accent-hover':   'var(--color-accent-hover)',
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

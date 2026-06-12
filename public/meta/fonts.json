@@ -448,6 +448,165 @@
       "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
       "filename": "Regular.ttf",
       "downloadUrl": "/fonts/tac-kaveri/Regular.ttf"
+    },
+    {
+      "id": "catamaran",
+      "name": "Catamaran",
+      "category": "Unicode",
+      "variants": [
+        "Thin",
+        "ExtraLight",
+        "Light",
+        "Regular",
+        "Medium",
+        "SemiBold",
+        "Bold",
+        "ExtraBold",
+        "Black"
+      ],
+      "author": "Pria Ravichandran",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "A versatile geometric sans-serif with 9 weights, excellent for headings and body text.",
+      "tags": [
+        "unicode",
+        "sans-serif",
+        "geometric",
+        "multi-weight",
+        "modern"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "Catamaran-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/Catamaran-Regular.ttf"
+    },
+    {
+      "id": "meera-tamil",
+      "name": "Meera Tamil",
+      "category": "Unicode",
+      "variants": [
+        "Regular"
+      ],
+      "author": "SMC (Swathanthra Malayalam Computing)",
+      "license": "GNU General Public License",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "A clean, readable Tamil font derived from the popular Meera Malayalam font family.",
+      "tags": [
+        "unicode",
+        "serif",
+        "readable",
+        "body-text"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "MeeraTamil-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/MeeraTamil-Regular.ttf"
+    },
+    {
+      "id": "post-no-bills-colombo",
+      "name": "PostNoBillsColombo",
+      "category": "Unicode",
+      "variants": [
+        "Light",
+        "Regular",
+        "Medium",
+        "SemiBold",
+        "Bold",
+        "ExtraBold"
+      ],
+      "author": "Pria Ravichandran",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "A condensed display font inspired by Sri Lanka street signage. Bold and impactful.",
+      "tags": [
+        "unicode",
+        "condensed",
+        "display",
+        "signage",
+        "bold"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "PostNoBillsColombo-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/PostNoBillsColombo-Regular.ttf"
+    },
+    {
+      "id": "post-no-bills-jaffna",
+      "name": "PostNoBillsJaffna",
+      "category": "Unicode",
+      "variants": [
+        "Light",
+        "Regular",
+        "Medium",
+        "SemiBold",
+        "Bold",
+        "ExtraBold"
+      ],
+      "author": "Pria Ravichandran",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "A condensed Tamil display font with the character of northern Sri Lankan typography.",
+      "tags": [
+        "unicode",
+        "condensed",
+        "display",
+        "jaffna",
+        "traditional"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "PostNoBillsJaffna-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/PostNoBillsJaffna-Regular.ttf"
+    },
+    {
+      "id": "yaldevi-colombo",
+      "name": "YaldeviColombo",
+      "category": "Unicode",
+      "variants": [
+        "ExtraLight",
+        "Light",
+        "Regular",
+        "Medium",
+        "SemiBold",
+        "Bold"
+      ],
+      "author": "Pria Ravichandran",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "An elegant Tamil serif with 6 weights, inspired by Sri Lankan calligraphic tradition.",
+      "tags": [
+        "unicode",
+        "serif",
+        "elegant",
+        "calligraphic",
+        "multi-weight"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "YaldeviColombo-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/YaldeviColombo-Regular.ttf"
+    },
+    {
+      "id": "yaldevi-jaffna",
+      "name": "YaldeviJaffna",
+      "category": "Unicode",
+      "variants": [
+        "ExtraLight",
+        "Light",
+        "Regular",
+        "Medium",
+        "SemiBold",
+        "Bold"
+      ],
+      "author": "Pria Ravichandran",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://github.com/thamizha/tamil-fonts",
+      "description": "A refined Tamil serif from the Yaldevi family with Jaffna regional design influences.",
+      "tags": [
+        "unicode",
+        "serif",
+        "refined",
+        "regional",
+        "jaffna"
+      ],
+      "sampleText": "வணக்கம் தமிழ் எழுத்துருக்கள் அழகானவை",
+      "filename": "YaldeviJaffna-Regular.ttf",
+      "downloadUrl": "https://raw.githubusercontent.com/thamizha/tamil-fonts/master/open-sourced/YaldeviJaffna-Regular.ttf"
     }
   ],
   "categories": [

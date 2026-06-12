@@ -13,16 +13,16 @@ export default function Header({ darkMode, setDarkMode }) {
   ];
 
   const linkClass = ({ isActive }) =>
-    `transition-colors ${isActive ? 'text-primary font-semibold' : 'text-text-secondary hover:text-primary'}`;
+    `transition-colors ${isActive ? 'text-primary dark:text-white font-semibold' : 'text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-white'}`;
 
   return (
-    <header className="sticky top-0 z-50 bg-bg border-b border-border backdrop-blur-sm bg-opacity-95">
+    <header className="sticky top-0 z-50 bg-bg dark:bg-black border-b border-border backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={() => setMobileOpen(false)}>
-            <Type className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold text-primary">easy-font-tamil</span>
+            <Type className="w-6 h-6 text-primary dark:text-white" />
+            <span className="text-xl font-bold text-primary dark:text-white">easy-font-tamil</span>
           </Link>
 
           {/* Desktop nav */}
@@ -44,7 +44,7 @@ export default function Header({ darkMode, setDarkMode }) {
             {/* Dark mode toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-bg-secondary transition-colors"
+              className="p-2 rounded-lg text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-white hover:bg-bg-secondary dark:hover:bg-gray-800 transition-colors"
               aria-label="Toggle dark mode"
               title="Toggle dark mode"
             >
@@ -53,7 +53,7 @@ export default function Header({ darkMode, setDarkMode }) {
 
             {/* Mobile hamburger */}
             <button
-              className="md:hidden p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-bg-secondary transition-colors"
+              className="md:hidden p-2 rounded-lg text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-white hover:bg-bg-secondary dark:hover:bg-gray-800 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -65,7 +65,7 @@ export default function Header({ darkMode, setDarkMode }) {
 
       {/* Mobile menu drawer */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-bg">
+        <div className="md:hidden border-t border-border bg-bg dark:bg-black">
           <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col space-y-1">
             {navLinks.map(({ to, label, exact }) => (
               <NavLink
@@ -75,8 +75,8 @@ export default function Header({ darkMode, setDarkMode }) {
                 className={({ isActive }) =>
                   `px-3 py-2 rounded-lg text-sm transition-colors ${
                     isActive
-                      ? 'bg-bg-secondary text-primary font-semibold'
-                      : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
+                      ? 'bg-bg-secondary dark:bg-gray-800 text-primary dark:text-white font-semibold'
+                      : 'text-text-secondary dark:text-gray-300 hover:bg-bg-secondary dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white'
                   }`
                 }
                 onClick={() => setMobileOpen(false)}
