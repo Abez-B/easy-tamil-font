@@ -5,6 +5,7 @@ import {
   ChevronDown, ArrowLeftRight,
 } from 'lucide-react';
 import { useFontsData } from '../hooks/useFontsData';
+import { romanize } from 'tamil-romanizer';
 
 // ─────────────────────────────────────────────────────────────────
 // 1A. TANGLISH → TAMIL  (fixed syllable-based engine)
@@ -142,85 +143,14 @@ function tanglishToTamil(text) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// 1B. TAMIL → TANGLISH  (lookup-table approach)
+// 1B. TAMIL → TANGLISH  (powered by tamil-romanizer package)
 // ─────────────────────────────────────────────────────────────────
-const LETTER_RULE = {
-  'அ':'a','ஆ':'aa','இ':'i','ஈ':'ee','உ':'u','ஊ':'oo',
-  'எ':'e','ஏ':'ae','ஐ':'ai','ஒ':'o','ஓ':'oa','ஔ':'au','ஃ':'ak',
-  'க்':'k','க':'ga','கா':'gaa','கி':'gi','கீ':'gee','கு':'gu','கூ':'goo','கெ':'ge','கே':'gae','கை':'gai','கொ':'go','கோ':'goa','கௌ':'gau',
-  'ங்':'ng','ங':'nga','ஙா':'ngaa','ஙி':'ngi','ஙீ':'ngee','ஙு':'ngu','ஙூ':'ngoo','ங்க':'nka',
-  'ச்':'ch','ச':'sa','சா':'saa','சி':'si','சீ':'see','சு':'su','சூ':'soo','செ':'se','சே':'sae','சை':'sai','சொ':'so','சோ':'soa','சௌ':'sau',
-  'ஞ்':'nj','ஞ':'nja','ஞா':'njaa','ஞி':'nji','ஞீ':'njee','ஞு':'nju','ஞூ':'njoo',
-  'ட்':'t','ட':'da','டா':'daa','டி':'di','டீ':'dee','டு':'du','டூ':'doo','டெ':'de','டே':'dae','டை':'dai','டொ':'do','டோ':'doa','டௌ':'dau',
-  'ண்':'N','ண':'Na','ணா':'Naa','ணி':'Ni','ணீ':'Nee','ணு':'Nu','ணூ':'Noo','ணெ':'Ne','ணே':'Nae','ணை':'Nai','ணொ':'No','ணோ':'Noa','ணௌ':'Nau',
-  'த்':'th','த':'tha','தா':'thaa','தி':'thi','தீ':'thee','து':'thu','தூ':'thoo','தெ':'the','தே':'thae','தை':'thai','தொ':'tho','தோ':'thoa','தௌ':'thau',
-  'ந்':'n','ந':'na','நா':'naa','நி':'ni','நீ':'nee','நு':'nu','நூ':'noo','நெ':'ne','நே':'nae','நை':'nai','நொ':'no','நோ':'noa','நௌ':'nau',
-  'ப்':'p','ப':'ba','பா':'baa','பி':'bi','பீ':'bee','பு':'bu','பூ':'boo','பெ':'be','பே':'bae','பை':'bai','பொ':'bo','போ':'boa','பௌ':'bau',
-  'ம்':'m','ம':'ma','மா':'maa','மி':'mi','மீ':'mee','மு':'mu','மூ':'moo','மெ':'me','மே':'mae','மை':'mai','மொ':'mo','மோ':'moa','மௌ':'mau',
-  'ய்':'y','ய':'ya','யா':'yaa','யி':'yi','யீ':'yee','யு':'yu','யூ':'yoo','யெ':'ye','யே':'yae','யை':'yai','யொ':'yo','யோ':'yoa','யௌ':'yau',
-  'ர்':'r','ர':'ra','ரா':'raa','ரி':'ri','ரீ':'ree','ரு':'ru','ரூ':'roo','ரெ':'re','ரே':'rae','ரை':'rai','ரொ':'ro','ரோ':'roa','ரௌ':'rau',
-  'ல்':'l','ல':'la','லா':'laa','லி':'li','லீ':'lee','லு':'lu','லூ':'loo','லெ':'le','லே':'lae','லை':'lai','லொ':'lo','லோ':'loa','லௌ':'lau',
-  'வ்':'v','வ':'va','வா':'vaa','வி':'vi','வீ':'vee','வு':'vu','வூ':'voo','வெ':'ve','வே':'vae','வை':'vai','வொ':'vo','வோ':'voa','வௌ':'vau',
-  'ழ்':'zh','ழ':'zha','ழா':'zhaa','ழி':'zhi','ழீ':'zhee','ழு':'zhu','ழூ':'zhoo','ழெ':'zhe','ழே':'zhae','ழை':'zhai','ழொ':'zho','ழோ':'zhoa','ழௌ':'zhau',
-  'ள்':'L','ள':'La','ளா':'Laa','ளி':'Li','ளீ':'Lee','ளு':'Lu','ளூ':'Loo','ளெ':'Le','ளே':'Lae','ளை':'Lai','ளொ':'Lo','ளோ':'Loa','ளௌ':'Lau',
-  'ற்':'rr','ற':'rra','றா':'rraa','றி':'rri','றீ':'rree','று':'rru','றூ':'rroo','றெ':'rre','றே':'rrae','றை':'rrai','றொ':'rro','றோ':'rroa','றௌ':'rrau',
-  'ன்':'n','ன':'na','னா':'naa','னி':'ni','னீ':'nee','னு':'nu','னூ':'noo','னெ':'ne','னே':'nae','னை':'nai','னொ':'no','னோ':'noa','னௌ':'nau',
-  'ஹ்':'h','ஹ':'ha','ஹா':'haa','ஹி':'hi','ஹீ':'hee','ஹு':'hu','ஹூ':'hoo','ஹெ':'he','ஹே':'hae','ஹை':'hai','ஹொ':'ho','ஹோ':'hoa','ஹௌ':'hau',
-  'ஜ்':'j','ஜ':'ja','ஜா':'jaa','ஜி':'ji','ஜீ':'jee','ஜு':'ju','ஜூ':'joo','ஜெ':'je','ஜே':'jae','ஜை':'jai','ஜொ':'jo','ஜோ':'joa','ஜௌ':'jau',
-  'ஷ்':'sh','ஷ':'sha','ஷா':'shaa','ஷி':'shi','ஷீ':'shee','ஷு':'shu','ஷூ':'shoo','ஷெ':'she','ஷே':'shae','ஷை':'shai','ஷொ':'sho','ஷோ':'shoa','ஷௌ':'shau',
-  'ஸ்':'s','ஸ':'sa','ஸா':'saa','ஸி':'si','ஸீ':'see','ஸு':'su','ஸூ':'soo','ஸெ':'se','ஸே':'sae','ஸை':'sai','ஸொ':'so','ஸோ':'soa','ஸௌ':'sau',
-  'ஸ்ரீ':'shri',
-};
-
-// Word-start alternates for ambiguous consonants
-const KA_START = {'க':'ka','கா':'kaa','கி':'ki','கீ':'kee','கு':'ku','கூ':'koo','கெ':'ke','கே':'kae','கை':'kai','கொ':'ko','கோ':'koa','கௌ':'kau'};
-const PA_START = {'ப':'pa','பா':'paa','பி':'pi','பீ':'pee','பு':'pu','பூ':'poo','பெ':'pe','பே':'pae','பை':'pai','பொ':'po','போ':'poa','பௌ':'pau'};
-const TH_START = {'த':'tha','தா':'thaa','தி':'thi','தீ':'thee','து':'thu','தூ':'thoo','தெ':'the','தே':'thae','தை':'thai','தொ':'tho','தோ':'thoa','தௌ':'thau'};
-const EXTRAS = ['','ா','ி','ீ','ு','ூ','ெ','ே','ை','ொ','ோ','ௌ'];
-const VALLINAM = ['க','ச','ட','த','ப','ற'];
-
 function tamilToTanglish(text) {
-  let result = '';
-  let wordStart = true;
-  let i = 0;
-
-  while (i < text.length) {
-    const two = text.slice(i, i + 2);
-    const one = text[i];
-    const prevTwo = i >= 2 ? text.slice(i - 2, i) : '';
-
-    if (LETTER_RULE[two] !== undefined) {
-      if (wordStart) {
-        if (EXTRAS.some(e => two === 'க' + e)) result += KA_START[two] ?? LETTER_RULE[two] ?? '';
-        else if (EXTRAS.some(e => two === 'த' + e)) result += TH_START[two] ?? LETTER_RULE[two] ?? '';
-        else if (EXTRAS.some(e => two === 'ப' + e)) result += PA_START[two] ?? LETTER_RULE[two] ?? '';
-        else result += LETTER_RULE[two] ?? '';
-      } else {
-        // After vallinam pulli → use hard form
-        const prevPulli = prevTwo.endsWith('்') && VALLINAM.includes(prevTwo[0]);
-        if (prevPulli) {
-          result += KA_START[two] ?? PA_START[two] ?? TH_START[two] ?? LETTER_RULE[two] ?? '';
-        } else {
-          result += LETTER_RULE[two] ?? '';
-        }
-      }
-      i += 2; wordStart = false;
-    } else if (LETTER_RULE[one] !== undefined) {
-      if (wordStart) {
-        if (EXTRAS.some(e => one === 'க' + e)) result += KA_START[one] ?? LETTER_RULE[one] ?? '';
-        else if (EXTRAS.some(e => one === 'த' + e)) result += TH_START[one] ?? LETTER_RULE[one] ?? '';
-        else if (EXTRAS.some(e => one === 'ப' + e)) result += PA_START[one] ?? LETTER_RULE[one] ?? '';
-        else result += LETTER_RULE[one] ?? '';
-      } else {
-        result += LETTER_RULE[one] ?? '';
-      }
-      i++; wordStart = false;
-    } else {
-      result += one; i++;
-      wordStart = /[\s,;:'"\-_().#@%*]/.test(one);
-    }
+  try {
+    return romanize(text);
+  } catch {
+    return text;
   }
-  return result.trim();
 }
 
 // ─────────────────────────────────────────────────────────────────

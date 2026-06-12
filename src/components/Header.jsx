@@ -27,13 +27,13 @@ export default function Header({ darkMode, setDarkMode }) {
             <img
               src={logoUrl}
               alt="easy-font-tamil"
-              className="hidden md:block h-9 w-auto object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
+              className="hidden md:block h-14 w-auto object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
             />
             {/* Square favicon — mobile only */}
             <img
               src={faviconUrl}
               alt="easy-font-tamil"
-              className="block md:hidden h-9 w-9 object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
+              className="block md:hidden h-11 w-11 object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
             />
           </Link>
 
