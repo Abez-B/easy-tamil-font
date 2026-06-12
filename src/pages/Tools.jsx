@@ -85,29 +85,40 @@ const PULLI = '்';
 function tanglishToTamil(text) {
   let out = '';
   let i = 0;
+  let wordStart = true; // true at start and after any non-alpha character
 
   while (i < text.length) {
     const ch = text[i];
 
-    // Pass through non-alpha (spaces, numbers, punctuation)
+    // Pass through non-alpha — space/punctuation resets word boundary
     if (!/[a-zA-Z]/.test(ch)) {
       out += ch;
       i++;
+      wordStart = true;
       continue;
     }
 
     // Try consonant match — case-sensitive, longest first
-    let consBase = null, consLen = 0;
+    let consBase = null, consLen = 0, consKey = null;
     for (const [pat, base] of CONS_RULES) {
       if (text.startsWith(pat, i)) {
         consBase = base;
         consLen = pat.length;
+        consKey = pat;
         break;
       }
     }
 
     if (consBase !== null) {
+      // Context-sensitive 'n': word-initial → ந (dental), medial → ன (alveolar)
+      // Capital N always stays as ண (retroflex) — handled by CONS_RULES ordering
+      if (consKey === 'n' && !wordStart) {
+        consBase = 'ன';
+      }
+
       i += consLen;
+      wordStart = false;
+
       // Try vowel immediately after — case-insensitive
       const rest = text.slice(i).toLowerCase();
       let vowMatra = null, vowLen = 0;
@@ -119,8 +130,8 @@ function tanglishToTamil(text) {
         }
       }
       out += vowMatra !== null
-        ? consBase + vowMatra   // consonant + vowel matra
-        : consBase + PULLI;     // consonant alone → pulli
+        ? consBase + vowMatra
+        : consBase + PULLI;
       if (vowMatra !== null) i += vowLen;
       continue;
     }
@@ -133,14 +144,21 @@ function tanglishToTamil(text) {
         out += vStand;
         i += vPat.length;
         matched = true;
+        wordStart = false;
         break;
       }
     }
-    if (!matched) { out += ch; i++; }
+    if (!matched) { out += ch; i++; wordStart = false; }
   }
+
+  // Post-processing: nasal assimilation before velar stops
+  // ன (medial n) + optional vowel matra + க → ண (retroflex nasal before velar)
+  // e.g. வன + க்கம் → வணக்கம்
+  out = out.replace(/ன([ாிீுூெேைொோௌ]?)க/g, 'ண$1க');
 
   return out;
 }
+
 
 // ─────────────────────────────────────────────────────────────────
 // 1B. TAMIL → TANGLISH  (powered by tamil-romanizer package)
