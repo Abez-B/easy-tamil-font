@@ -1,238 +1,223 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, Copy, Check, Keyboard, Code2, Type, ChevronDown,
+  ArrowLeft, Copy, Check, Keyboard, Code2, Type,
+  ChevronDown, ArrowLeftRight,
 } from 'lucide-react';
 import { useFontsData } from '../hooks/useFontsData';
 
 // ─────────────────────────────────────────────────────────────────
-// 1A. TANGLISH → TAMIL  (rule-based, real-time)
+// 1A. TANGLISH → TAMIL  (fixed syllable-based engine)
 // ─────────────────────────────────────────────────────────────────
-const CONSONANTS = {
-  // 3-char clusters (longest first)
-  'Ksh': 'க்ஷ', 'ksh': 'க்ஷ',
-  // 2-char clusters — ASPIRATES (common in borrowed names like Bharath, Ghee)
-  'Bh': 'ப', 'bh': 'ப',
-  'Gh': 'க', 'gh': 'க',
-  'Kh': 'க', 'kh': 'க',
-  'Ph': 'ப', 'ph': 'ப',
-  // 2-char clusters — Tamil specific
-  'ng': 'ங', 'NG': 'ங',
-  'nj': 'ஞ', 'NJ': 'ஞ',
-  'nh': 'ண', 'NH': 'ண',
-  'nd': 'ந', 'ND': 'ந',
-  'ch': 'ச', 'Ch': 'ச', 'CH': 'ச',
-  'sh': 'ஷ', 'Sh': 'ஷ', 'SH': 'ஷ',
-  'zh': 'ழ', 'Zh': 'ழ', 'ZH': 'ழ',
-  'dh': 'த', 'Dh': 'த', 'DH': 'த',
-  'th': 'த', 'TH': 'த',
-  'Th': 'ட',               // uppercase Th = retroflex ட
-  'Dh': 'ட',
-  'rr': 'ற', 'RR': 'ற',
-  'll': 'ள', 'LL': 'ள',
-  'nn': 'ன', 'NN': 'ன',
-  // 1-char — lowercase and uppercase both mapped
-  'k': 'க', 'K': 'க',
-  'g': 'க', 'G': 'க',
-  'c': 'ச', 'C': 'ச',
-  's': 'ஸ', 'S': 'ஸ',
-  't': 'ட', // lowercase t = retroflex ட
-  'T': 'த', // uppercase T = dental த
-  'd': 'ட', 'D': 'ட',
-  'n': 'ந', 'N': 'ண',     // uppercase N = retroflex ண
-  'p': 'ப', 'P': 'ப',
-  'b': 'ப', 'B': 'ப',
-  'f': 'ப', 'F': 'ப',
-  'm': 'ம', 'M': 'ம',
-  'y': 'ய', 'Y': 'ய',
-  'j': 'ஜ', 'J': 'ஜ',
-  'r': 'ர',                // lowercase r = ர
-  'R': 'ற',               // uppercase R = ற
-  'l': 'ல', 'L': 'ள',    // uppercase L = retroflex ள
-  'v': 'வ', 'V': 'வ',
-  'w': 'வ', 'W': 'வ',
-  'z': 'ழ', 'Z': 'ழ',
-  'h': 'ஹ', 'H': 'ஹ',
-  'x': 'க்ஸ', 'X': 'க்ஸ',
-  'q': 'க்', 'Q': 'க்',
-};
+// Consonant rules: [tanglish_pattern, tamil_base_without_pulli]
+// Ordered LONGEST first. Matched case-sensitively.
+const CONS_RULES = [
+  // 3-char clusters
+  ['ksh', 'க்ஷ'], ['Ksh', 'க்ஷ'], ['KSH', 'க்ஷ'],
+  // 2-char true clusters
+  ['ng',  'ங'], ['NG',  'ங'],
+  ['nj',  'ஞ'], ['NJ',  'ஞ'],
+  ['nh',  'ண'],
+  ['nd',  'ந'],
+  ['ch',  'ச'], ['Ch',  'ச'], ['CH',  'ச'],
+  ['sh',  'ஷ'], ['Sh',  'ஷ'], ['SH',  'ஷ'],
+  ['zh',  'ழ'], ['Zh',  'ழ'], ['ZH',  'ழ'],
+  ['th',  'த'], ['TH',  'த'],
+  ['Th',  'ட'],
+  ['dh',  'த'], ['DH',  'த'],
+  ['Dh',  'ட'],
+  ['bh',  'ப'], ['Bh',  'ப'], ['BH',  'ப'],
+  ['gh',  'க'], ['Gh',  'க'],
+  ['ph',  'ப'], ['Ph',  'ப'],
+  ['kh',  'க'], ['Kh',  'க'],
+  // rr/RR → ற (hard Tamil R — very common convention)
+  ['rr',  'ற'], ['RR',  'ற'],
+  // NOTE: 'll' is intentionally NOT a cluster; treated as double-l → ல்ல
+  // 1-char consonants
+  ['k', 'க'], ['K', 'க'],
+  ['g', 'க'], ['G', 'க'],
+  ['c', 'ச'], ['C', 'ச'],
+  ['s', 'ஸ'],
+  ['S', 'ஷ'],
+  ['j', 'ஜ'], ['J', 'ஜ'],
+  ['t', 'ட'],   // retroflex ட (lowercase t)
+  ['T', 'த'],   // dental த (uppercase T)
+  ['d', 'ட'], ['D', 'ட'],
+  ['n', 'ந'],   // dental ந
+  ['N', 'ண'],   // retroflex ண (uppercase N)
+  ['p', 'ப'], ['P', 'ப'],
+  ['b', 'ப'], ['B', 'ப'],
+  ['f', 'ப'], ['F', 'ப'],
+  ['m', 'ம'], ['M', 'ம'],
+  ['y', 'ய'], ['Y', 'ய'],
+  ['r', 'ர'],
+  ['R', 'ற'],   // hard ற (uppercase R)
+  ['l', 'ல'],
+  ['L', 'ள'],   // retroflex ள (uppercase L)
+  ['v', 'வ'], ['V', 'வ'],
+  ['w', 'வ'], ['W', 'வ'],
+  ['z', 'ழ'], ['Z', 'ழ'],
+  ['h', 'ஹ'], ['H', 'ஹ'],
+  ['x', 'க்ஸ'],
+  ['q', 'க'], ['Q', 'க'],
+];
 
-const VOWEL_STANDALONE = {
-  'aa': 'ஆ', 'ii': 'ஈ', 'ee': 'ஏ', 'uu': 'ஊ', 'oo': 'ஓ',
-  'ai': 'ஐ', 'au': 'ஔ',
-  'a': 'அ', 'i': 'இ', 'u': 'உ', 'e': 'எ', 'o': 'ஒ',
-};
-
-const VOWEL_MATRA = {
-  'aa': 'ா', 'ii': 'ீ', 'ee': 'ே', 'uu': 'ூ', 'oo': 'ோ',
-  'ai': 'ை', 'au': 'ௌ',
-  'a': '',  // implicit — base consonant already encodes 'a'
-  'i': 'ி', 'u': 'ு', 'e': 'ெ', 'o': 'ொ',
-};
+// Vowel rules: [tanglish, standalone, matra]
+// Ordered LONGEST first. Matched case-insensitively.
+const VOW_RULES = [
+  ['aa', 'ஆ', 'ா'],
+  ['ii', 'ஈ', 'ீ'],
+  ['ee', 'ஏ', 'ே'],
+  ['uu', 'ஊ', 'ூ'],
+  ['oo', 'ஓ', 'ோ'],
+  ['ai', 'ஐ', 'ை'],
+  ['au', 'ஔ', 'ௌ'],
+  ['a',  'அ', ''],
+  ['i',  'இ', 'ி'],
+  ['u',  'உ', 'ு'],
+  ['e',  'எ', 'ெ'],
+  ['o',  'ஒ', 'ொ'],
+];
 
 const PULLI = '்';
-const CONS_KEYS = Object.keys(CONSONANTS).sort((a, b) => b.length - a.length);
-const VOW_KEYS  = Object.keys(VOWEL_STANDALONE).sort((a, b) => b.length - a.length);
 
 function tanglishToTamil(text) {
   let out = '';
   let i = 0;
+
   while (i < text.length) {
     const ch = text[i];
-    if (!/[a-zA-Z]/.test(ch)) { out += ch; i++; continue; }
 
-    // Try consonant (case-sensitive match, covers both lower and upper entries above)
-    let cons = null, consLen = 0;
-    for (const k of CONS_KEYS) {
-      if (text.startsWith(k, i)) { cons = CONSONANTS[k]; consLen = k.length; break; }
-    }
-
-    if (cons !== null) {
-      i += consLen;
-      // Try vowel after consonant
-      let matra = null, vowLen = 0;
-      for (const k of VOW_KEYS) {
-        if (text.slice(i).toLowerCase().startsWith(k)) {
-          matra = VOWEL_MATRA[k]; vowLen = k.length; break;
-        }
-      }
-      if (matra !== null) { out += cons + matra; i += vowLen; }
-      else { out += cons + PULLI; }
+    // Pass through non-alpha (spaces, numbers, punctuation)
+    if (!/[a-zA-Z]/.test(ch)) {
+      out += ch;
+      i++;
       continue;
     }
 
-    // Try standalone vowel (case-insensitive)
+    // Try consonant match — case-sensitive, longest first
+    let consBase = null, consLen = 0;
+    for (const [pat, base] of CONS_RULES) {
+      if (text.startsWith(pat, i)) {
+        consBase = base;
+        consLen = pat.length;
+        break;
+      }
+    }
+
+    if (consBase !== null) {
+      i += consLen;
+      // Try vowel immediately after — case-insensitive
+      const rest = text.slice(i).toLowerCase();
+      let vowMatra = null, vowLen = 0;
+      for (const [vPat, , vMatra] of VOW_RULES) {
+        if (rest.startsWith(vPat)) {
+          vowMatra = vMatra;
+          vowLen = vPat.length;
+          break;
+        }
+      }
+      out += vowMatra !== null
+        ? consBase + vowMatra   // consonant + vowel matra
+        : consBase + PULLI;     // consonant alone → pulli
+      if (vowMatra !== null) i += vowLen;
+      continue;
+    }
+
+    // Try standalone vowel — case-insensitive
+    const rest = text.slice(i).toLowerCase();
     let matched = false;
-    for (const k of VOW_KEYS) {
-      if (text.slice(i).toLowerCase().startsWith(k)) {
-        out += VOWEL_STANDALONE[k]; i += k.length; matched = true; break;
+    for (const [vPat, vStand] of VOW_RULES) {
+      if (rest.startsWith(vPat)) {
+        out += vStand;
+        i += vPat.length;
+        matched = true;
+        break;
       }
     }
     if (!matched) { out += ch; i++; }
   }
+
   return out;
 }
 
 // ─────────────────────────────────────────────────────────────────
-// 1B. TAMIL → TANGLISH  (ported from tamil-translite python lib)
+// 1B. TAMIL → TANGLISH  (lookup-table approach)
 // ─────────────────────────────────────────────────────────────────
 const LETTER_RULE = {
-  "அ":"a","ஆ":"aa","இ":"i","ஈ":"ee","உ":"u","ஊ":"oo","எ":"e","ஏ":"ye","ஐ":"ai","ஒ":"o","ஓ":"o","ஃ":"ak",
-  "க்":"k","க":"ga","கா":"gaa","கி":"gi","கீ":"gee","கு":"gu","கூ":"goo","கெ":"ge","கே":"ge","கை":"gai","கொ":"go","கோ":"go","கௌ":"gau",
-  "ங்":"ng","ங":"nga","ஙா":"ngaa","ஙி":"ngi","ஙீ":"ngee","ஙு":"ngu","ஙூ":"ngoo","ஙெ":"nge","ஙே":"ngae","ஙை":"ngai","ஙொ":"ngo","ஙோ":"ngoo","ஙௌ":"ngau",
-  "ச்":"ch","ச":"sa","சா":"saa","சி":"si","சீ":"see","சு":"su","சூ":"soo","செ":"se","சே":"sae","சை":"sai","சொ":"so","சோ":"so","சௌ":"sau",
-  "ஞ்":"nj","ஞ":"nja","ஞா":"njaa","ஞி":"nji","ஞீ":"njee","ஞு":"nju","ஞூ":"njoo","ஞெ":"njae","ஞே":"njae","ஞை":"njai","ஞொ":"njo","ஞோ":"njo","ஞௌ":"njau",
-  "ட்":"t","ட":"da","டா":"daa","டி":"di","டீ":"dee","டு":"du","டூ":"doo","டெ":"de","டே":"dae","டை":"dai","டொ":"do","டோ":"do","டௌ":"dau",
-  "ண்":"n","ண":"na","ணா":"naa","ணி":"ni","ணீ":"nee","ணு":"nu","ணூ":"noo","ணெ":"ne","ணே":"nae","ணை":"nai","ணொ":"no","ணோ":"no","ணௌ":"nau",
-  "த்":"th","த":"dha","தா":"dhaa","தி":"dhi","தீ":"dhee","து":"dhu","தூ":"dhoo","தெ":"dhe","தே":"dhae","தை":"dhai","தொ":"dho","தோ":"dho","தௌ":"dheu",
-  "ந்":"n","ந":"na","நா":"naa","நி":"ni","நீ":"nee","நு":"nu","நூ":"noo","நெ":"ne","நே":"nae","நை":"nai","நொ":"no","நோ":"no","நௌ":"neu",
-  "ப்":"p","ப":"ba","பா":"baa","பி":"bi","பீ":"bee","பு":"bu","பூ":"boo","பெ":"be","பே":"bae","பை":"bai","பொ":"bo","போ":"bo","பௌ":"bau",
-  "ம்":"m","ம":"ma","மா":"maa","மி":"mi","மீ":"mee","மு":"mu","மூ":"moo","மெ":"me","மே":"mae","மை":"mai","மொ":"mo","மோ":"mo","மௌ":"mau",
-  "ய்":"i","ய":"ya","யா":"yaa","யி":"yi","யீ":"yee","யு":"yu","யூ":"yoo","யெ":"ye","யே":"yae","யை":"yai","யொ":"yo","யோ":"yo","யௌ":"yau",
-  "ர்":"r","ர":"ra","ரா":"raa","ரி":"ri","ரீ":"ree","ரு":"ru","ரூ":"roo","ரெ":"re","ரே":"rae","ரை":"rai","ரொ":"ro","ரோ":"ro","ரௌ":"rau",
-  "ல்":"l","ல":"la","லா":"laa","லி":"li","லீ":"lee","லு":"lu","லூ":"loo","லெ":"le","லே":"lae","லை":"lai","லொ":"lo","லோ":"lo","லௌ":"lau",
-  "வ்":"v","வ":"va","வா":"vaa","வி":"vi","வீ":"vee","வு":"vu","வூ":"voo","வெ":"ve","வே":"vae","வை":"vai","வொ":"vo","வோ":"vo","வௌ":"vau",
-  "ழ்":"zh","ழ":"zha","ழா":"zhaa","ழி":"zhi","ழீ":"zhee","ழு":"zhu","ழூ":"zhoo","ழெ":"zhe","ழே":"zhae","ழை":"zhai","ழொ":"zho","ழோ":"zho","ழௌ":"zhau",
-  "ள்":"l","ள":"la","ளா":"laa","ளி":"li","ளீ":"lee","ளு":"lu","ளூ":"loo","ளெ":"le","ளே":"lae","ளை":"lai","ளொ":"lo","ளோ":"lo","ளௌ":"lau",
-  "ற்":"r","ற":"ra","றா":"raa","றி":"ri","றீ":"ree","று":"ru","றூ":"roo","றெ":"re","றே":"rae","றை":"rai","றொ":"ro","றோ":"ro","றௌ":"rau",
-  "ன்":"n","ன":"na","னா":"naa","னி":"ni","னீ":"nee","னு":"nu","னூ":"noo","னெ":"ne","னே":"ne","னை":"nai","னொ":"no","னோ":"no","னௌ":"nau",
-  "ஔ":"au",
-  "ஹ்":"h","ஹ":"ha","ஹா":"haa","ஹி":"hi","ஹீ":"hee","ஹு":"hu","ஹூ":"hoo","ஹெ":"he","ஹே":"he","ஹை":"hai","ஹொ":"ho","ஹோ":"ho","ஹௌ":"hau",
-  "ஜ்":"j","ஜ":"ja","ஜா":"jaa","ஜி":"ji","ஜீ":"jee","ஜு":"ju","ஜூ":"joo","ஜெ":"je","ஜே":"je","ஜை":"jai","ஜொ":"jo","ஜோ":"jo","ஜௌ":"jau",
-  "ஷ்":"sh","ஷ":"sha","ஷா":"shaa","ஷி":"shi","ஷீ":"shee","ஷு":"shu","ஷூ":"shoo","ஷெ":"she","ஷே":"she","ஷை":"shai","ஷொ":"sho","ஷோ":"sho","ஷௌ":"shau",
-  "ஸ்":"s","ஸ":"sa","ஸா":"saa","ஸி":"si","ஸீ":"see","ஸு":"su","ஸூ":"soo","ஸெ":"se","ஸே":"se","ஸை":"sai","ஸொ":"so","ஸோ":"so","ஸௌ":"sau",
-  "ஸ்ரீ":"shri","ஶ்":"s",
+  'அ':'a','ஆ':'aa','இ':'i','ஈ':'ee','உ':'u','ஊ':'oo',
+  'எ':'e','ஏ':'ae','ஐ':'ai','ஒ':'o','ஓ':'oa','ஔ':'au','ஃ':'ak',
+  'க்':'k','க':'ga','கா':'gaa','கி':'gi','கீ':'gee','கு':'gu','கூ':'goo','கெ':'ge','கே':'gae','கை':'gai','கொ':'go','கோ':'goa','கௌ':'gau',
+  'ங்':'ng','ங':'nga','ஙா':'ngaa','ஙி':'ngi','ஙீ':'ngee','ஙு':'ngu','ஙூ':'ngoo','ங்க':'nka',
+  'ச்':'ch','ச':'sa','சா':'saa','சி':'si','சீ':'see','சு':'su','சூ':'soo','செ':'se','சே':'sae','சை':'sai','சொ':'so','சோ':'soa','சௌ':'sau',
+  'ஞ்':'nj','ஞ':'nja','ஞா':'njaa','ஞி':'nji','ஞீ':'njee','ஞு':'nju','ஞூ':'njoo',
+  'ட்':'t','ட':'da','டா':'daa','டி':'di','டீ':'dee','டு':'du','டூ':'doo','டெ':'de','டே':'dae','டை':'dai','டொ':'do','டோ':'doa','டௌ':'dau',
+  'ண்':'N','ண':'Na','ணா':'Naa','ணி':'Ni','ணீ':'Nee','ணு':'Nu','ணூ':'Noo','ணெ':'Ne','ணே':'Nae','ணை':'Nai','ணொ':'No','ணோ':'Noa','ணௌ':'Nau',
+  'த்':'th','த':'tha','தா':'thaa','தி':'thi','தீ':'thee','து':'thu','தூ':'thoo','தெ':'the','தே':'thae','தை':'thai','தொ':'tho','தோ':'thoa','தௌ':'thau',
+  'ந்':'n','ந':'na','நா':'naa','நி':'ni','நீ':'nee','நு':'nu','நூ':'noo','நெ':'ne','நே':'nae','நை':'nai','நொ':'no','நோ':'noa','நௌ':'nau',
+  'ப்':'p','ப':'ba','பா':'baa','பி':'bi','பீ':'bee','பு':'bu','பூ':'boo','பெ':'be','பே':'bae','பை':'bai','பொ':'bo','போ':'boa','பௌ':'bau',
+  'ம்':'m','ம':'ma','மா':'maa','மி':'mi','மீ':'mee','மு':'mu','மூ':'moo','மெ':'me','மே':'mae','மை':'mai','மொ':'mo','மோ':'moa','மௌ':'mau',
+  'ய்':'y','ய':'ya','யா':'yaa','யி':'yi','யீ':'yee','யு':'yu','யூ':'yoo','யெ':'ye','யே':'yae','யை':'yai','யொ':'yo','யோ':'yoa','யௌ':'yau',
+  'ர்':'r','ர':'ra','ரா':'raa','ரி':'ri','ரீ':'ree','ரு':'ru','ரூ':'roo','ரெ':'re','ரே':'rae','ரை':'rai','ரொ':'ro','ரோ':'roa','ரௌ':'rau',
+  'ல்':'l','ல':'la','லா':'laa','லி':'li','லீ':'lee','லு':'lu','லூ':'loo','லெ':'le','லே':'lae','லை':'lai','லொ':'lo','லோ':'loa','லௌ':'lau',
+  'வ்':'v','வ':'va','வா':'vaa','வி':'vi','வீ':'vee','வு':'vu','வூ':'voo','வெ':'ve','வே':'vae','வை':'vai','வொ':'vo','வோ':'voa','வௌ':'vau',
+  'ழ்':'zh','ழ':'zha','ழா':'zhaa','ழி':'zhi','ழீ':'zhee','ழு':'zhu','ழூ':'zhoo','ழெ':'zhe','ழே':'zhae','ழை':'zhai','ழொ':'zho','ழோ':'zhoa','ழௌ':'zhau',
+  'ள்':'L','ள':'La','ளா':'Laa','ளி':'Li','ளீ':'Lee','ளு':'Lu','ளூ':'Loo','ளெ':'Le','ளே':'Lae','ளை':'Lai','ளொ':'Lo','ளோ':'Loa','ளௌ':'Lau',
+  'ற்':'rr','ற':'rra','றா':'rraa','றி':'rri','றீ':'rree','று':'rru','றூ':'rroo','றெ':'rre','றே':'rrae','றை':'rrai','றொ':'rro','றோ':'rroa','றௌ':'rrau',
+  'ன்':'n','ன':'na','னா':'naa','னி':'ni','னீ':'nee','னு':'nu','னூ':'noo','னெ':'ne','னே':'nae','னை':'nai','னொ':'no','னோ':'noa','னௌ':'nau',
+  'ஹ்':'h','ஹ':'ha','ஹா':'haa','ஹி':'hi','ஹீ':'hee','ஹு':'hu','ஹூ':'hoo','ஹெ':'he','ஹே':'hae','ஹை':'hai','ஹொ':'ho','ஹோ':'hoa','ஹௌ':'hau',
+  'ஜ்':'j','ஜ':'ja','ஜா':'jaa','ஜி':'ji','ஜீ':'jee','ஜு':'ju','ஜூ':'joo','ஜெ':'je','ஜே':'jae','ஜை':'jai','ஜொ':'jo','ஜோ':'joa','ஜௌ':'jau',
+  'ஷ்':'sh','ஷ':'sha','ஷா':'shaa','ஷி':'shi','ஷீ':'shee','ஷு':'shu','ஷூ':'shoo','ஷெ':'she','ஷே':'shae','ஷை':'shai','ஷொ':'sho','ஷோ':'shoa','ஷௌ':'shau',
+  'ஸ்':'s','ஸ':'sa','ஸா':'saa','ஸி':'si','ஸீ':'see','ஸு':'su','ஸூ':'soo','ஸெ':'se','ஸே':'sae','ஸை':'sai','ஸொ':'so','ஸோ':'soa','ஸௌ':'sau',
+  'ஸ்ரீ':'shri',
 };
 
-const KA_RULE = {"க":"ka","கா":"kaa","கி":"ki","கீ":"kee","கு":"ku","கூ":"koo","கெ":"ke","கே":"kae","கை":"kai","கொ":"ko","கோ":"ko","கௌ":"kau"};
-const SA_RULE = {"ச":"cha","சா":"chaa","சி":"chi","சீ":"chee","சு":"chu","சூ":"choo","செ":"che","சே":"chae","சை":"chai","சொ":"cho","சோ":"cho","சௌ":"chau"};
-const TA_RULE = {"ட":"ta","டா":"taa","டி":"ti","டீ":"tee","டு":"tu","டூ":"too","டெ":"te","டே":"tae","டை":"tai","டொ":"to","டோ":"to","டௌ":"tau"};
-const PA_RULE = {"ப":"pa","பா":"paa","பி":"pi","பீ":"pee","பு":"pu","பூ":"poo","பெ":"pe","பே":"pae","பை":"pai","பொ":"po","போ":"po","பௌ":"pau"};
-const THA_RULE = {"த":"tha","தா":"thaa","தி":"thi","தீ":"thee","து":"thu","தூ":"thoo","தெ":"the","தே":"thae","தை":"thai","தொ":"tho","தோ":"tho","தௌ":"thau"};
-
-const VALLINAM = ["க","ச","ட","த","ப","ற"];
-const MELLINAM = ["ங","ஞ","ண","ந","ம","ன"];
-const IDAIYINAM = ["ய","ர","ல","வ","ழ","ள"];
-const EXTRAS_KEYS = ["","ா","ி","ீ","ு","ூ","ெ","ே","ை","ொ","ோ","ௌ"];
-
-const SPECIAL_CASE = {
-  "பலம்":"balam","பாரதி":"bharathi","பூமி":"boomi","பாரதம்":"bharatham",
-  "பயந்து":"bayanthu","பயம்":"bayam","பிடி":"pidi","படு":"padu",
-  "சரி":"seri","சென்னை":"chennai","பெங்களூர்":"bengaloor",
-};
-
-function olipeyarppu(wordStart, tamWord, prevComb, nextNextChar, nextChar) {
-  const vallinaComb = [...VALLINAM,...MELLINAM,...IDAIYINAM,"ஸ","ஷ"].map(l => l + "்");
-
-  if (wordStart) {
-    if (EXTRAS_KEYS.some(e => tamWord === "க" + e)) return KA_RULE[tamWord] ?? LETTER_RULE[tamWord] ?? '';
-    if (EXTRAS_KEYS.some(e => tamWord === "த" + e)) return THA_RULE[tamWord] ?? LETTER_RULE[tamWord] ?? '';
-    if (EXTRAS_KEYS.slice(2).some(e => tamWord === "ட" + e)) return TA_RULE[tamWord] ?? LETTER_RULE[tamWord] ?? '';
-    if (EXTRAS_KEYS.some(e => tamWord === "ப" + e)) return PA_RULE[tamWord] ?? LETTER_RULE[tamWord] ?? '';
-    return LETTER_RULE[tamWord] ?? '';
-  }
-
-  if (tamWord === "க" && prevComb === "று") return "ka";
-
-  if (vallinaComb.includes(prevComb)) {
-    let r = '';
-    if (prevComb === "ன்") {
-      if (tamWord === "று") return "dru";
-      if (tamWord === "றி") return "dri";
-      if (tamWord === "ற") return "dra";
-      if (tamWord === "றை") return "drai";
-      if (EXTRAS_KEYS.some(e => tamWord === "ப" + e)) return LETTER_RULE[tamWord] ?? '';
-    }
-    if (r === '' && ["க்","ச்","ட்","த்","ப்","ற்","ஷ்","ஸ்"].includes(prevComb)) {
-      r += KA_RULE[tamWord] ?? '';
-      r += SA_RULE[tamWord] ?? '';
-      r += TA_RULE[tamWord] ?? '';
-      r += THA_RULE[tamWord] ?? '';
-      r += PA_RULE[tamWord] ?? '';
-    }
-    if (r === '') r = LETTER_RULE[tamWord] ?? '';
-    return r;
-  }
-
-  if (tamWord === "ற்" && nextNextChar === "ற") return "t";
-
-  return LETTER_RULE[tamWord] ?? '';
-}
+// Word-start alternates for ambiguous consonants
+const KA_START = {'க':'ka','கா':'kaa','கி':'ki','கீ':'kee','கு':'ku','கூ':'koo','கெ':'ke','கே':'kae','கை':'kai','கொ':'ko','கோ':'koa','கௌ':'kau'};
+const PA_START = {'ப':'pa','பா':'paa','பி':'pi','பீ':'pee','பு':'pu','பூ':'poo','பெ':'pe','பே':'pae','பை':'pai','பொ':'po','போ':'poa','பௌ':'pau'};
+const TH_START = {'த':'tha','தா':'thaa','தி':'thi','தீ':'thee','து':'thu','தூ':'thoo','தெ':'the','தே':'thae','தை':'thai','தொ':'tho','தோ':'thoa','தௌ':'thau'};
+const EXTRAS = ['','ா','ி','ீ','ு','ூ','ெ','ே','ை','ொ','ோ','ௌ'];
+const VALLINAM = ['க','ச','ட','த','ப','ற'];
 
 function tamilToTanglish(text) {
-  // Apply special cases
-  let processed = text;
-  for (const [k, v] of Object.entries(SPECIAL_CASE)) {
-    processed = processed.replaceAll(k, v);
-  }
-
   let result = '';
   let wordStart = true;
   let i = 0;
 
-  while (i < processed.length) {
-    const twoChar = processed.slice(i, i + 2);
-    const oneChar = processed[i];
-    const prevComb = i >= 2 ? processed.slice(i - 2, i) : '';
-    const nextChar = i + 1 < processed.length ? processed[i + 1] : '';
-    const nextNextChar = i + 2 < processed.length ? processed[i + 2] : '';
+  while (i < text.length) {
+    const two = text.slice(i, i + 2);
+    const one = text[i];
+    const prevTwo = i >= 2 ? text.slice(i - 2, i) : '';
 
-    if (LETTER_RULE[twoChar] !== undefined) {
-      result += olipeyarppu(wordStart, twoChar, prevComb, nextNextChar, nextChar);
-      i++; // skip next Tamil char (it was part of the combo)
-      wordStart = false;
-    } else if (LETTER_RULE[oneChar] !== undefined) {
-      result += olipeyarppu(wordStart, oneChar, prevComb, nextNextChar, nextChar);
-      wordStart = false;
+    if (LETTER_RULE[two] !== undefined) {
+      if (wordStart) {
+        if (EXTRAS.some(e => two === 'க' + e)) result += KA_START[two] ?? LETTER_RULE[two] ?? '';
+        else if (EXTRAS.some(e => two === 'த' + e)) result += TH_START[two] ?? LETTER_RULE[two] ?? '';
+        else if (EXTRAS.some(e => two === 'ப' + e)) result += PA_START[two] ?? LETTER_RULE[two] ?? '';
+        else result += LETTER_RULE[two] ?? '';
+      } else {
+        // After vallinam pulli → use hard form
+        const prevPulli = prevTwo.endsWith('்') && VALLINAM.includes(prevTwo[0]);
+        if (prevPulli) {
+          result += KA_START[two] ?? PA_START[two] ?? TH_START[two] ?? LETTER_RULE[two] ?? '';
+        } else {
+          result += LETTER_RULE[two] ?? '';
+        }
+      }
+      i += 2; wordStart = false;
+    } else if (LETTER_RULE[one] !== undefined) {
+      if (wordStart) {
+        if (EXTRAS.some(e => one === 'க' + e)) result += KA_START[one] ?? LETTER_RULE[one] ?? '';
+        else if (EXTRAS.some(e => one === 'த' + e)) result += TH_START[one] ?? LETTER_RULE[one] ?? '';
+        else if (EXTRAS.some(e => one === 'ப' + e)) result += PA_START[one] ?? LETTER_RULE[one] ?? '';
+        else result += LETTER_RULE[one] ?? '';
+      } else {
+        result += LETTER_RULE[one] ?? '';
+      }
+      i++; wordStart = false;
     } else {
-      result += oneChar;
-    }
-
-    i++;
-    wordStart = false;
-    const BOUNDARIES = ' \n,;:\'-_().#@%*';
-    if (i < processed.length && BOUNDARIES.includes(processed[i - 1])) {
-      wordStart = true;
+      result += one; i++;
+      wordStart = /[\s,;:'"\-_().#@%*]/.test(one);
     }
   }
   return result.trim();
@@ -241,17 +226,14 @@ function tamilToTanglish(text) {
 // ─────────────────────────────────────────────────────────────────
 // 2. UNICODE EXPLORER
 // ─────────────────────────────────────────────────────────────────
+function isTamil(cp) { return cp >= 0x0B80 && cp <= 0x0BFF; }
+
 function exploreUnicode(text) {
   return [...text].map((ch) => {
     const cp = ch.codePointAt(0);
     const hex = cp.toString(16).toUpperCase().padStart(4, '0');
-    const name = isTamil(cp) ? 'Tamil' : 'Other';
-    return { char: ch, codepoint: cp, hex: `U+${hex}`, name };
+    return { char: ch, codepoint: cp, hex: `U+${hex}`, isTamil: isTamil(cp) };
   });
-}
-
-function isTamil(cp) {
-  return (cp >= 0x0B80 && cp <= 0x0BFF);
 }
 
 function escapesToChars(text) {
@@ -261,7 +243,7 @@ function escapesToChars(text) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Shared copy hook
+// Shared utilities
 // ─────────────────────────────────────────────────────────────────
 function useCopy() {
   const [copied, setCopied] = useState(false);
@@ -274,37 +256,42 @@ function useCopy() {
   return { copied, copy };
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Shared UI primitives
-// ─────────────────────────────────────────────────────────────────
-function CopyBtn({ text }) {
+function CopyBtn({ text, size = 'sm' }) {
   const { copied, copy } = useCopy();
   return (
     <button
       onClick={() => copy(text)}
       title="Copy to clipboard"
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg
-        bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200
-        hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+      className={`inline-flex items-center gap-1.5 rounded-lg transition-all
+        ${size === 'xs'
+          ? 'px-2 py-1 text-xs'
+          : 'px-3 py-1.5 text-sm'
+        }
+        ${copied
+          ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+        }`}
     >
-      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-      {copied ? 'Copied!' : 'Copy'}
+      {copied
+        ? <><Check className="w-3.5 h-3.5" /> Copied!</>
+        : <><Copy className="w-3.5 h-3.5" /> Copy</>
+      }
     </button>
   );
 }
 
-function Label({ children }) {
+function FieldLabel({ children }) {
   return (
-    <label className="block text-xs font-semibold uppercase tracking-wider
-      text-gray-500 dark:text-gray-400 mb-1.5">
+    <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
       {children}
     </label>
   );
 }
 
-function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style }) {
+function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style, id }) {
   return (
     <textarea
+      id={id}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
@@ -312,7 +299,7 @@ function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style }) {
       rows={rows}
       style={style}
       className="w-full px-4 py-3 rounded-xl border resize-none
-        bg-white dark:bg-gray-800
+        bg-white dark:bg-gray-900
         text-gray-900 dark:text-white
         border-gray-200 dark:border-gray-700
         placeholder-gray-400 dark:placeholder-gray-500
@@ -326,17 +313,38 @@ function Textarea({ value, onChange, placeholder, rows = 4, readOnly, style }) {
 // TOOL 1 — Transliterator
 // ─────────────────────────────────────────────────────────────────
 const QUICK_TIPS = [
-  { key: 'aa', val: 'ஆ' }, { key: 'ii', val: 'ஈ' }, { key: 'ee', val: 'ஏ' },
-  { key: 'uu', val: 'ஊ' }, { key: 'oo', val: 'ஓ' }, { key: 'ai', val: 'ஐ' },
-  { key: 'au', val: 'ஔ' }, { key: 'zh', val: 'ழ' }, { key: 'rr / RR', val: 'ற' },
-  { key: 'll / LL', val: 'ள' }, { key: 'N', val: 'ண' }, { key: 'Th', val: 'ட' },
-  { key: 'T', val: 'த' }, { key: 'ng', val: 'ங' }, { key: 'Bh', val: 'ப (aspirate)' },
-  { key: 'R', val: 'ற' }, { key: 'L', val: 'ள' }, { key: 'sh / Sh', val: 'ஷ' },
+  { key: 'aa',       val: 'ஆ — long A' },
+  { key: 'ii / ee',  val: 'ஈ — long I' },
+  { key: 'uu / oo',  val: 'ஊ — long U' },
+  { key: 'ai',       val: 'ஐ' },
+  { key: 'au',       val: 'ஔ' },
+  { key: 'zh',       val: 'ழ — unique Tamil zh' },
+  { key: 'rr / R',   val: 'ற — hard Tamil R' },
+  { key: 'L',        val: 'ள — retroflex L' },
+  { key: 'N',        val: 'ண — retroflex N' },
+  { key: 'Th',       val: 'ட — retroflex T' },
+  { key: 'th / T',   val: 'த — dental T' },
+  { key: 'sh / Sh',  val: 'ஷ' },
+  { key: 'ch',       val: 'ச' },
+  { key: 'ng',       val: 'ங' },
+  { key: 'nj',       val: 'ஞ' },
+  { key: 'll',       val: 'ல்ல — double L' },
+  { key: 'LL',       val: 'ள்ள — double retroflex L' },
+];
+
+const EXAMPLES = [
+  { tanglish: 'vanakkam', tamil: 'வணக்கம்', note: '(use N for ண)' },
+  { tanglish: 'vaNakkam', tamil: 'வணக்கம்' },
+  { tanglish: 'tamiZH',   tamil: 'தமிழ்' },
+  { tanglish: 'nalla',    tamil: 'நல்ல' },
+  { tanglish: 'iLLai',    tamil: 'இல்லை' },
+  { tanglish: 'Chennai',  tamil: 'சென்னை' },
 ];
 
 function TransliteratorTool() {
   const [input, setInput] = useState('');
   const [mode, setMode] = useState('tanglish'); // 'tanglish' | 'tamil'
+  const [showTips, setShowTips] = useState(false);
 
   const output = mode === 'tanglish'
     ? tanglishToTamil(input)
@@ -344,71 +352,87 @@ function TransliteratorTool() {
 
   const isTamilMode = mode === 'tamil';
 
+  const handleSwap = () => {
+    const newMode = isTamilMode ? 'tanglish' : 'tamil';
+    setMode(newMode);
+    setInput(output);
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Mode toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-gray-500 dark:text-gray-400">Direction:</span>
-        <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden text-sm shadow-sm">
           <button
             onClick={() => { setMode('tanglish'); setInput(''); }}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`px-4 py-2.5 font-medium transition-colors ${
               !isTamilMode
                 ? 'bg-red-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
             }`}
           >
             Tanglish → Tamil
           </button>
           <button
             onClick={() => { setMode('tamil'); setInput(''); }}
-            className={`px-4 py-2 font-medium transition-colors border-l border-gray-200 dark:border-gray-700 ${
+            className={`px-4 py-2.5 font-medium transition-colors border-l border-gray-200 dark:border-gray-700 ${
               isTamilMode
                 ? 'bg-red-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
             }`}
           >
             Tamil → Tanglish
           </button>
         </div>
+        <button
+          onClick={handleSwap}
+          title="Swap input/output"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium
+            border border-gray-200 dark:border-gray-700
+            bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300
+            hover:border-red-400 dark:hover:border-red-500 hover:text-red-600 dark:hover:text-red-400
+            transition-all"
+        >
+          <ArrowLeftRight className="w-4 h-4" />
+          <span className="hidden sm:inline">Swap</span>
+        </button>
       </div>
 
       <p className="text-sm text-gray-500 dark:text-gray-400">
         {isTamilMode ? (
-          <>Paste Tamil script and get phonetic Tanglish instantly.
-            <strong className="text-gray-700 dark:text-gray-300"> Example: </strong>
-            <span style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>வணக்கம்</span>
+          <>Paste Tamil script and get phonetic Tanglish.
+            {' '}Example: <span style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>வணக்கம்</span>
             {' → vanakkam'}
           </>
         ) : (
-          <>Type English phonetics (Tanglish) and see Tamil script instantly.
-            <strong className="text-gray-700 dark:text-gray-300"> Example: </strong>
-            <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-red-600 dark:text-red-400">
-              BhaaraTh
-            </code>
+          <>Type Tanglish (English phonetics) and see Tamil script instantly.
+            {' '}Example: <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-red-600 dark:text-red-400">vaNakkam</code>
             {' → '}
-            <span style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>பாரத்</span>
+            <span style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>வணக்கம்</span>
           </>
         )}
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* I/O panels */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <Label>{isTamilMode ? 'Tamil Input' : 'Tanglish Input'}</Label>
+          <FieldLabel>{isTamilMode ? 'Tamil Input' : 'Tanglish Input'}</FieldLabel>
           <Textarea
+            id="transliterator-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={isTamilMode ? 'Paste Tamil text… e.g. வணக்கம்' : 'Type here… e.g. BhaaraTh'}
+            placeholder={isTamilMode ? 'Paste Tamil text… e.g. வணக்கம்' : 'Type here… e.g. vaNakkam'}
             rows={5}
             style={isTamilMode ? { fontFamily: "'Noto Sans Tamil', system-ui", fontSize: '1.15rem' } : undefined}
           />
         </div>
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <Label>{isTamilMode ? 'Tanglish Output' : 'Tamil Output'}</Label>
+            <FieldLabel>{isTamilMode ? 'Tanglish Output' : 'Tamil Output'}</FieldLabel>
             <CopyBtn text={output} />
           </div>
           <Textarea
+            id="transliterator-output"
             value={output}
             readOnly
             placeholder={isTamilMode ? 'Tanglish will appear here…' : 'Tamil script will appear here…'}
@@ -418,26 +442,49 @@ function TransliteratorTool() {
         </div>
       </div>
 
-      {/* Quick reference — only in Tanglish→Tamil mode */}
+      {/* Quick examples — Tanglish mode */}
       {!isTamilMode && (
-        <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-red-600 dark:text-red-400
-            hover:underline list-none flex items-center gap-1">
-            <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
-            Key conventions
-          </summary>
-          <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {QUICK_TIPS.map(({ key, val }) => (
-              <div key={key}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-                  bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm">
-                <code className="font-mono text-red-600 dark:text-red-400">{key}</code>
+        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-4">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {EXAMPLES.map(({ tanglish, tamil }) => (
+              <button
+                key={tanglish}
+                onClick={() => setInput(tanglish)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm
+                  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+                  hover:border-red-400 dark:hover:border-red-500 transition-all group"
+              >
+                <code className="text-red-600 dark:text-red-400 font-mono">{tanglish}</code>
                 <span className="text-gray-400">→</span>
-                <span className="text-gray-800 dark:text-gray-200">{val}</span>
-              </div>
+                <span className="text-gray-700 dark:text-gray-200" style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>{tamil}</span>
+              </button>
             ))}
           </div>
-        </details>
+
+          {/* Key conventions */}
+          <button
+            onClick={() => setShowTips(!showTips)}
+            className="flex items-center gap-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
+          >
+            <span className={`transition-transform inline-block ${showTips ? 'rotate-90' : ''}`}>▶</span>
+            Key conventions
+          </button>
+          {showTips && (
+            <div className="mt-3 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2">
+              {QUICK_TIPS.map(({ key, val }) => (
+                <div
+                  key={key}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                    bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm"
+                >
+                  <code className="font-mono text-red-600 dark:text-red-400 shrink-0">{key}</code>
+                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-700 dark:text-gray-200">{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -460,8 +507,9 @@ function UnicodeExplorerTool() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           Enter any Tamil text to see the Unicode code point for each character.
         </p>
-        <Label>Enter Tamil text</Label>
+        <FieldLabel>Enter Tamil text</FieldLabel>
         <Textarea
+          id="unicode-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g. வணக்கம்"
@@ -470,40 +518,76 @@ function UnicodeExplorerTool() {
         />
 
         {chars.length > 0 && (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  <th className="pb-2 pr-4">Char</th>
-                  <th className="pb-2 pr-4">Code Point</th>
-                  <th className="pb-2 pr-4">Decimal</th>
-                  <th className="pb-2">Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {chars.map(({ char, codepoint, hex, name }, idx) => (
-                  <tr key={idx}
-                    className="border-t border-gray-100 dark:border-gray-800">
-                    <td className="py-2 pr-4 font-bold text-xl"
-                      style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>{char}</td>
-                    <td className="py-2 pr-4">
-                      <code className="bg-red-50 dark:bg-red-900/30 text-red-700
-                        dark:text-red-300 px-2 py-0.5 rounded font-mono">{hex}</code>
-                    </td>
-                    <td className="py-2 pr-4 text-gray-500 dark:text-gray-400">{codepoint}</td>
-                    <td className="py-2">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium
-                        ${name === 'Tamil'
-                          ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                        }`}>
-                        {name}
-                      </span>
-                    </td>
+          <div className="mt-4">
+            {/* Cards on mobile, table on md+ */}
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:hidden gap-2">
+              {chars.map(({ char, codepoint, hex, isTamil: isTa }, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => navigator.clipboard.writeText(hex)}
+                  title={`Click to copy ${hex}`}
+                  className={`flex flex-col items-center p-3 rounded-xl border transition-all
+                    hover:border-red-400 dark:hover:border-red-500 active:scale-95
+                    ${isTa
+                      ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    }`}
+                >
+                  <span className="text-2xl mb-1" style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>
+                    {char === ' ' ? '␣' : char}
+                  </span>
+                  <code className="text-xs font-mono text-red-600 dark:text-red-400">{hex}</code>
+                  <span className="text-xs text-gray-400 mt-0.5">{codepoint}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Table on md+ */}
+            <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-900 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <th className="px-4 py-2.5 text-left">Char</th>
+                    <th className="px-4 py-2.5 text-left">Code Point</th>
+                    <th className="px-4 py-2.5 text-left">Decimal</th>
+                    <th className="px-4 py-2.5 text-left">Type</th>
+                    <th className="px-4 py-2.5 text-left"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {chars.map(({ char, codepoint, hex, isTamil: isTa }, idx) => (
+                    <tr key={idx} className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                      <td className="px-4 py-3 text-xl font-bold" style={{ fontFamily: "'Noto Sans Tamil', system-ui" }}>
+                        {char === ' ' ? '␣' : char}
+                      </td>
+                      <td className="px-4 py-3">
+                        <code className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded font-mono">
+                          {hex}
+                        </code>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{codepoint}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium
+                          ${isTa
+                            ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                          }`}>
+                          {isTa ? 'Tamil' : 'Other'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => navigator.clipboard.writeText(hex)}
+                          className="text-xs text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        >
+                          Copy
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
@@ -511,13 +595,15 @@ function UnicodeExplorerTool() {
       {/* Section B — escape converter */}
       <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Convert Unicode escapes like <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5
-          rounded text-red-600 dark:text-red-400">U+0B95</code> to actual characters.
+          Convert Unicode escapes like{' '}
+          <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-red-600 dark:text-red-400">U+0B95</code>
+          {' '}to actual characters.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label>Unicode Escapes Input</Label>
+            <FieldLabel>Unicode Escapes Input</FieldLabel>
             <Textarea
+              id="unicode-escape-input"
               value={escInput}
               onChange={(e) => setEscInput(e.target.value)}
               placeholder="e.g. U+0B95 U+0BC1"
@@ -526,10 +612,11 @@ function UnicodeExplorerTool() {
           </div>
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <Label>Characters</Label>
+              <FieldLabel>Characters</FieldLabel>
               <CopyBtn text={converted} />
             </div>
             <Textarea
+              id="unicode-escape-output"
               value={converted}
               readOnly
               rows={3}
@@ -543,16 +630,14 @@ function UnicodeExplorerTool() {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// TOOL 4 — Font Tester
+// TOOL 3 — Font Tester
 // ─────────────────────────────────────────────────────────────────
 function FontTesterTool() {
   const { fonts, loading } = useFontsData();
   const [text, setText] = useState('வணக்கம் உலகம்! தமிழ் எழுத்துருக்கள்.');
   const [selectedFont, setSelectedFont] = useState('');
   const [fontSize, setFontSize] = useState(32);
-  const { copied, copy } = useCopy();
 
-  // Pick default font when data loads
   const font = fonts.find(f => f.name === selectedFont) || fonts[0];
   const fontName = font?.name || '';
 
@@ -565,22 +650,21 @@ function FontTesterTool() {
   return (
     <div className="space-y-5">
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Preview any Unicode Tamil text in every font from our gallery. Select a font,
-        adjust the size, and inspect per-character Unicode code points.
+        Preview any Unicode Tamil text in every font from our gallery. Select a font, adjust the size, and inspect per-character Unicode code points.
       </p>
 
-      {/* Controls row */}
-      <div className="flex flex-wrap gap-3 items-end">
-        {/* Font selector */}
-        <div className="flex-1 min-w-[180px]">
-          <Label>Font</Label>
+      {/* Controls */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <FieldLabel>Font</FieldLabel>
           <div className="relative">
             <select
+              id="font-tester-select"
               value={selectedFont || fontName}
               onChange={e => setSelectedFont(e.target.value)}
               disabled={loading}
-              className="w-full appearance-none pl-3 pr-8 py-2 rounded-xl border text-sm
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+              className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl border text-sm
+                bg-white dark:bg-gray-900 text-gray-900 dark:text-white
                 border-gray-200 dark:border-gray-700
                 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
             >
@@ -591,28 +675,31 @@ function FontTesterTool() {
                   ))
               }
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4
-              text-gray-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
 
-        {/* Size slider */}
-        <div className="min-w-[160px]">
-          <Label>Size: {fontSize}px</Label>
-          <input
-            type="range"
-            min={12} max={72} step={2}
-            value={fontSize}
-            onChange={e => setFontSize(Number(e.target.value))}
-            className="w-full accent-red-600"
-          />
+        <div>
+          <FieldLabel>Size: {fontSize}px</FieldLabel>
+          <div className="flex items-center gap-3 h-10">
+            <span className="text-xs text-gray-400">12</span>
+            <input
+              type="range" min={12} max={72} step={2}
+              value={fontSize}
+              onChange={e => setFontSize(Number(e.target.value))}
+              className="flex-1 accent-red-600"
+              id="font-size-slider"
+            />
+            <span className="text-xs text-gray-400">72</span>
+          </div>
         </div>
       </div>
 
       {/* Text input */}
       <div>
-        <Label>Unicode Tamil Input</Label>
+        <FieldLabel>Unicode Tamil Input</FieldLabel>
         <Textarea
+          id="font-tester-input"
           value={text}
           onChange={e => setText(e.target.value)}
           placeholder="Type or paste Unicode Tamil here…"
@@ -621,73 +708,75 @@ function FontTesterTool() {
         />
       </div>
 
-      {/* Rendered preview */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700
-        bg-gray-50 dark:bg-gray-800/50 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-wider
-            text-gray-500 dark:text-gray-400">
-            {fontName || 'Select a font'}
-          </span>
+      {/* Preview */}
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Preview
+            </span>
+            {fontName && (
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-medium">
+                {fontName}
+              </span>
+            )}
+          </div>
           <CopyBtn text={text} />
         </div>
         <div
+          className="px-5 py-4 text-gray-900 dark:text-white min-h-[3.5em] break-words"
           style={{
             fontFamily: fontName ? `"${fontName}", 'Noto Sans Tamil', system-ui` : 'system-ui',
             fontSize: `${fontSize}px`,
             lineHeight: 1.7,
-            wordBreak: 'break-word',
           }}
-          className="text-gray-900 dark:text-white min-h-[3em]"
         >
           {text || <span className="text-gray-400 dark:text-gray-500 text-base">Preview will appear here…</span>}
         </div>
       </div>
 
-      {/* Font metadata badge */}
+      {/* Font metadata */}
       {font && (
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-900/40
-            text-red-700 dark:text-red-300 font-medium">{font.category}</span>
-          <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800
-            text-gray-600 dark:text-gray-400">{font.license}</span>
+          <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-medium">
+            {font.category}
+          </span>
+          <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+            {font.license}
+          </span>
           {font.variants?.length > 0 && (
-            <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800
-              text-gray-600 dark:text-gray-400">{font.variants.length} variant{font.variants.length > 1 ? 's' : ''}</span>
+            <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+              {font.variants.length} variant{font.variants.length > 1 ? 's' : ''}
+            </span>
           )}
         </div>
       )}
 
-      {/* Unicode codepoints breakdown */}
+      {/* Codepoints breakdown */}
       {text.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-red-600 dark:text-red-400
-            hover:underline list-none flex items-center gap-1">
+          <summary className="cursor-pointer text-sm font-medium text-red-600 dark:text-red-400 hover:underline list-none flex items-center gap-1">
             <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
             Unicode code points ({[...text].length} chars)
           </summary>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {codepoints.map(({ ch, cp, isTamil }, i) => (
-              <div
+            {codepoints.map(({ ch, cp, isTamil: isTa }, i) => (
+              <button
                 key={i}
-                title={cp}
+                title={`Click to copy ${cp}`}
                 onClick={() => navigator.clipboard.writeText(cp)}
                 className={`flex flex-col items-center px-2 py-1.5 rounded-lg border cursor-pointer
-                  text-xs transition-colors hover:border-red-400 dark:hover:border-red-500
-                  ${
-                    isTamil
-                      ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800'
-                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                  text-xs transition-all hover:border-red-400 dark:hover:border-red-500 active:scale-95
+                  ${isTa
+                    ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800'
+                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                   }`}
               >
-                <span
-                  className="text-lg leading-tight"
-                  style={{ fontFamily: fontName ? `"${fontName}", 'Noto Sans Tamil', system-ui` : 'Noto Sans Tamil' }}
-                >
+                <span className="text-lg leading-tight" style={{ fontFamily: fontName ? `"${fontName}", 'Noto Sans Tamil', system-ui` : 'Noto Sans Tamil' }}>
                   {ch === ' ' ? '␣' : ch}
                 </span>
                 <span className="mt-0.5 font-mono text-[10px] text-gray-500 dark:text-gray-400">{cp}</span>
-              </div>
+              </button>
             ))}
           </div>
           <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">Click any tile to copy its code point.</p>
@@ -695,12 +784,10 @@ function FontTesterTool() {
       )}
 
       {/* Legacy font note */}
-      <div className="rounded-xl border border-amber-200 dark:border-amber-800
-        bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm">
+      <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm">
         <p className="text-amber-800 dark:text-amber-300 font-medium mb-1">Need legacy font encoding?</p>
         <p className="text-amber-700 dark:text-amber-400">
-          For converting Unicode Tamil to Bamini, TAB, Vanavil, Shree Lipi and other
-          legacy formats, use{' '}
+          For converting Unicode Tamil to Bamini, TAB, Vanavil, Shree Lipi and other legacy formats, use{' '}
           <a
             href="https://tamilfontconverter.co.in/unicode_to_non_unicode.html"
             target="_blank" rel="noreferrer"
@@ -719,8 +806,8 @@ function FontTesterTool() {
 // ─────────────────────────────────────────────────────────────────
 const TABS = [
   { id: 'transliterator', label: 'Transliterator',  icon: Keyboard, desc: 'Tanglish ↔ Tamil' },
-  { id: 'unicode',        label: 'Unicode Explorer', icon: Code2,    desc: 'Code points & escapes' },
-  { id: 'font-tester',   label: 'Font Tester',       icon: Type,     desc: 'Preview in any gallery font' },
+  { id: 'unicode',        label: 'Unicode',          icon: Code2,    desc: 'Code points & escapes' },
+  { id: 'font-tester',   label: 'Font Tester',       icon: Type,     desc: 'Preview in any font' },
 ];
 
 export default function Tools() {
@@ -728,40 +815,43 @@ export default function Tools() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Back link */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400
-            hover:text-gray-900 dark:hover:text-white mb-8 transition-colors text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Gallery
-        </Link>
-
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Tamil Tools</h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Utilities for working with Tamil text — all free, most run entirely in your browser.
+      {/* Page hero */}
+      <div className="hero-section border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 relative z-10">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400
+              hover:text-red-600 dark:hover:text-red-400 mb-5 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Gallery
+          </Link>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary dark:text-gray-100 mb-2">
+            Tamil Tools
+          </h1>
+          <p className="text-text-secondary dark:text-gray-400 text-base">
+            Utilities for working with Tamil text — all free, all run in your browser.
           </p>
         </div>
+      </div>
 
-        {/* Tab bar */}
-        <div className="flex flex-wrap gap-2 mb-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+        {/* Tab bar — horizontally scrollable on mobile */}
+        <div className="flex overflow-x-auto gap-2 pb-1 mb-5 scrollbar-hide">
           {TABS.map(({ id, label, icon: Icon, desc }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
-                transition-all border
+                transition-all border whitespace-nowrap shrink-0
                 ${activeTab === id
-                  ? 'bg-red-600 dark:bg-red-500 text-white border-red-600 dark:border-red-500 shadow-md'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600'
+                  ? 'bg-red-600 dark:bg-red-600 text-white border-red-600 dark:border-red-600 shadow-md'
+                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600 hover:text-red-600 dark:hover:text-red-400'
                 }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4 h-4 shrink-0" />
               <span>{label}</span>
-              <span className={`hidden sm:inline text-xs ${activeTab === id ? 'text-red-200' : 'text-gray-400 dark:text-gray-500'}`}>
+              <span className={`hidden md:inline text-xs ${activeTab === id ? 'text-red-200' : 'text-gray-400 dark:text-gray-500'}`}>
                 — {desc}
               </span>
             </button>
@@ -769,11 +859,10 @@ export default function Tools() {
         </div>
 
         {/* Tool panel */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800
-          shadow-sm p-6 md:p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-4 sm:p-6 md:p-8">
           {activeTab === 'transliterator' && <TransliteratorTool />}
-          {activeTab === 'unicode'         && <UnicodeExplorerTool />}
-          {activeTab === 'font-tester'     && <FontTesterTool />}
+          {activeTab === 'unicode'        && <UnicodeExplorerTool />}
+          {activeTab === 'font-tester'    && <FontTesterTool />}
         </div>
       </div>
     </div>

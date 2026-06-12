@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import faviconUrl from '../assets/easy-tamil-font-favicon.png';
+import logoUrl from '../assets/easy-tamil-font-logo.png';
 
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -21,16 +22,19 @@ export default function Header({ darkMode, setDarkMode }) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group" onClick={() => setMobileOpen(false)}>
-            {/* Favicon image with dark mode smart inversion (black turns white, red stays red) */}
-            <div className="relative h-10 w-10 flex items-center justify-center shrink-0">
-              <img 
-                src={faviconUrl} 
-                alt="easy-font-tamil icon" 
-                className="h-full w-full object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105 drop-shadow-sm"
-              />
-            </div>
-            <span className="text-xl font-bold text-gradient hidden sm:inline-block">easy-font-tamil</span>
+          <Link to="/" className="flex items-center group" onClick={() => setMobileOpen(false)}>
+            {/* Full landscape logo — desktop only */}
+            <img
+              src={logoUrl}
+              alt="easy-font-tamil"
+              className="hidden md:block h-9 w-auto object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
+            />
+            {/* Square favicon — mobile only */}
+            <img
+              src={faviconUrl}
+              alt="easy-font-tamil"
+              className="block md:hidden h-9 w-9 object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop nav */}
