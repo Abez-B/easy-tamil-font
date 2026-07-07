@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
-import faviconUrl from '../assets/easy-tamil-font-favicon.png';
-import logoUrl from '../assets/easy-tamil-font-logo.png';
+import faviconUrl from '../assets/ezhuthurukal-favicon.png';
+import logoUrl from '../assets/ezhuthurukal-logo.png';
 
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);

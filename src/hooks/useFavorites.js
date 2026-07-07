@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 export function useFavorites() {
   const [favorites, setFavorites] = useState(() => {
     try {
-      const stored = localStorage.getItem('easy-tamil-font-favorites');
+      const stored = localStorage.getItem('ezhuthurukal-favorites');
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -11,7 +11,7 @@ export function useFavorites() {
   });
 
   useEffect(() => {
-    localStorage.setItem('easy-tamil-font-favorites', JSON.stringify(favorites));
+    localStorage.setItem('ezhuthurukal-favorites', JSON.stringify(favorites));
   }, [favorites]);
 
   const toggleFavorite = (fontId, e) => {

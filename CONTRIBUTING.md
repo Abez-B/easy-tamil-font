@@ -102,7 +102,7 @@ Before submitting your PR:
 
 ## Questions or Issues?
 
-If you have questions or encounter issues while contributing, please open an [issue on GitHub](https://github.com/Abez-B/easy-tamil-font/issues). We're happy to help!
+If you have questions or encounter issues while contributing, please open an [issue on GitHub](https://github.com/Abez-B/ezhuthurukal/issues). We're happy to help!
 
 ## Code of Conduct
 

@@ -41,7 +41,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a 
-                href="https://github.com/Abez-B/easy-tamil-font" 
+                href="https://github.com/Abez-B/ezhuthurukal" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
