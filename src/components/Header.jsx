@@ -24,7 +24,7 @@ export default function Header({ darkMode, setDarkMode }) {
             <img
               src={faviconUrl}
               alt="ezhuthurukal logo"
-              className="h-11 w-11 md:h-12 md:w-12 object-contain transition-all duration-300 group-hover:scale-105"
+              className="h-12 w-12 object-contain transition-all duration-300 group-hover:scale-105"
             />
             <span className="font-heading font-extrabold text-xl md:text-2xl tracking-tight text-primary dark:text-white transition-colors duration-300">
               ezhuthurukal
