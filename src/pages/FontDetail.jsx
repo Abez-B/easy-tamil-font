@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Download, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, Loader2, RefreshCw, Bold, Italic, Heart } from 'lucide-react';
 import { useFontsData } from '../hooks/useFontsData';
+import { useFavorites } from '../hooks/useFavorites';
 import FontPreview from '../components/FontPreview';
+import GlyphChart from '../components/GlyphChart';
+import { getRandomPangram, getRandomParagraph, PANGRAMS } from '../utils/pangrams';
 
 export default function FontDetail() {
   const { id } = useParams();
@@ -11,16 +14,56 @@ export default function FontDetail() {
   const font = fonts.find((f) => f.id === id);
 
   const [customText, setCustomText] = useState(undefined);
+  const [fontSize, setFontSize] = useState(32);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [activeMode, setActiveMode] = useState('custom');
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const { toggleFavorite, isFavorite } = useFavorites();
+
+  const isFav = font ? isFavorite(font.id) : false;
+
+  useEffect(() => {
+    setSelectedVariantIndex(0);
+  }, [font?.id]);
+
+  const activeVariant = font?.variantsList?.[selectedVariantIndex] || font;
+  
+  // Create a proxy object for components that expect standard font structure
+  const fontForPreview = {
+    ...font,
+    name: activeVariant?.originalName || activeVariant?.fontFamily || font?.name,
+    downloadUrl: activeVariant?.downloadUrl || font?.downloadUrl
+  };
+
+  const isLegacy = font?.category === 'TACE16';
+  
+  const categoryBadgeClass = !isLegacy
+    ? 'badge-unicode'
+    : 'badge-tace16';
+
+  const handleModeChange = (mode) => {
+    setActiveMode(mode);
+    if (mode === 'sentence') {
+      let next;
+      do { next = getRandomPangram(); } while (next === customText && PANGRAMS.length > 1);
+      setCustomText(next);
+    } else if (mode === 'paragraph') {
+      setCustomText(getRandomParagraph(3));
+    } else if (mode === 'alphabet') {
+      setCustomText('அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ க ச ட த ந ப ம ய ர ல வ ழ ள ற ன');
+    } else if (mode === 'numerals') {
+      setCustomText('௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯ 0 1 2 3 4 5 6 7 8 9');
+    } else {
+      setCustomText('');
+    }
+  };
 
   const resolvedCustomText = customText !== undefined
     ? customText
     : (font?.sampleText ?? '');
 
   useFontsData();
-
-  const categoryBadgeClass = font?.category === 'Unicode'
-    ? 'badge-unicode'
-    : 'badge-tace16';
 
   // ── Loading ────────────────────────────────────────────
   if (loading) {
@@ -77,8 +120,15 @@ export default function FontDetail() {
           <div className="lg:col-span-2">
             {/* Font title */}
             <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-primary dark:text-white">{font.name}</h1>
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-primary dark:text-white">{font.name} {activeVariant?.variantName && activeVariant.variantName !== 'Regular' ? activeVariant.variantName : ''}</h1>
+                <button 
+                  onClick={(e) => toggleFavorite(font.id, e)}
+                  className="p-1.5 rounded-full bg-white dark:bg-gray-800 border border-border shadow-sm text-text-secondary dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                  title={isFav ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <Heart className="w-5 h-5" fill={isFav ? "currentColor" : "none"} color={isFav ? "#ef4444" : "currentColor"} />
+                </button>
                 <span className={`badge ${categoryBadgeClass}`}>
                   {font.category}
                 </span>
@@ -87,7 +137,7 @@ export default function FontDetail() {
             </div>
 
             {/* Live preview panel */}
-            <div className="bg-bg-secondary dark:bg-gray-900 rounded-xl p-6 mb-6">
+            <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-border rounded-xl p-6 mb-6 shadow-sm">
               <h2 className="font-semibold text-primary dark:text-white mb-4">Live Preview</h2>
 
               {font.category === 'TACE16' ? (
@@ -104,10 +154,38 @@ export default function FontDetail() {
                 </div>
               ) : (
                 <>
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    {['custom', 'sentence', 'paragraph', 'alphabet', 'numerals'].map((mode) => (
+                      <button
+                        key={mode}
+                        onClick={() => handleModeChange(mode)}
+                        className={`px-3 py-1 text-sm rounded-full capitalize transition-colors ${
+                          activeMode === mode
+                            ? 'bg-accent text-white border border-accent'
+                            : 'bg-white dark:bg-gray-800 text-text-secondary dark:text-gray-400 border border-border dark:border-gray-700 hover:border-accent dark:hover:border-accent'
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    ))}
+                    {(activeMode === 'sentence' || activeMode === 'paragraph') && (
+                      <button
+                        onClick={() => handleModeChange(activeMode)}
+                        className="p-1.5 rounded-full bg-bg-secondary dark:bg-gray-800 text-text-secondary dark:text-gray-400 hover:text-accent transition-colors border border-border dark:border-gray-700"
+                        title="Get another random text"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
                   {/* textarea — explicit dark classes so browser defaults can't override */}
                   <textarea
                     value={resolvedCustomText}
-                    onChange={(e) => setCustomText(e.target.value)}
+                    onChange={(e) => {
+                      setCustomText(e.target.value);
+                      setActiveMode('custom');
+                    }}
                     placeholder="Type your text here to preview…"
                     rows="3"
                     className="
@@ -120,15 +198,58 @@ export default function FontDetail() {
                       transition-colors resize-none
                     "
                   />
-                  <FontPreview font={font} customText={resolvedCustomText} />
+                  
+                  <div className="flex flex-wrap items-center gap-4 mb-4 bg-white/80 dark:bg-black/50 p-3 rounded-lg border border-border dark:border-zinc-800 backdrop-blur-sm">
+                    <div className="flex-1 flex items-center gap-4 min-w-[200px]">
+                      <label htmlFor="fontSizeSlider" className="text-sm font-medium text-text-secondary dark:text-gray-400 whitespace-nowrap">
+                        Size: {fontSize}px
+                      </label>
+                      <input
+                        id="fontSizeSlider"
+                        type="range"
+                        min="12"
+                        max="96"
+                        value={fontSize}
+                        onChange={(e) => setFontSize(Number(e.target.value))}
+                        className="w-full accent-primary"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 border-l border-border dark:border-gray-700 pl-4">
+                      <button
+                        onClick={() => setIsBold(!isBold)}
+                        className={`p-1.5 rounded-md transition-colors ${isBold ? 'bg-accent text-white' : 'text-text-secondary dark:text-gray-400 hover:bg-bg-secondary dark:hover:bg-gray-700'}`}
+                        title="Toggle Bold"
+                      >
+                        <Bold className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setIsItalic(!isItalic)}
+                        className={`p-1.5 rounded-md transition-colors ${isItalic ? 'bg-accent text-white' : 'text-text-secondary dark:text-gray-400 hover:bg-bg-secondary dark:hover:bg-gray-700'}`}
+                        title="Toggle Italic"
+                      >
+                        <Italic className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <FontPreview 
+                    font={fontForPreview} 
+                    customText={resolvedCustomText} 
+                    fontSize={fontSize} 
+                    fontWeight={isBold ? 'bold' : 'normal'}
+                    fontStyle={isItalic ? 'italic' : 'normal'}
+                  />
                 </>
               )}
             </div>
+            
+            {!isLegacy && <GlyphChart fontFamily={font.name} />}
           </div>
 
           {/* ── Right: metadata ── */}
           <div>
-            <div className="bg-bg-secondary dark:bg-gray-900 rounded-xl p-6 sticky top-24">
+            <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-border shadow-sm rounded-xl p-6 sticky top-24">
               <h2 className="font-semibold text-primary dark:text-white mb-4">Font Details</h2>
 
               <div className="space-y-4">
@@ -143,10 +264,20 @@ export default function FontDetail() {
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-medium text-text-secondary dark:text-gray-500 uppercase tracking-wider mb-1">Variants</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {font.variants.map((variant) => (
-                      <span key={variant} className="badge">{variant}</span>
+                  <h3 className="text-xs font-medium text-text-secondary dark:text-gray-500 uppercase tracking-wider mb-2">Select Variant</h3>
+                  <div className="flex flex-col gap-2">
+                    {font.variantsList?.map((variant, idx) => (
+                      <button
+                        key={variant.variantName}
+                        onClick={() => setSelectedVariantIndex(idx)}
+                        className={`text-left px-3 py-2 rounded-lg text-sm transition-colors border ${
+                          idx === selectedVariantIndex
+                            ? 'bg-accent/10 border-accent text-accent dark:text-red-400 font-semibold'
+                            : 'bg-white dark:bg-gray-800 border-transparent text-text-secondary dark:text-gray-400 hover:border-border dark:hover:border-gray-600'
+                        }`}
+                      >
+                        {variant.variantName}
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -162,7 +293,7 @@ export default function FontDetail() {
 
                 <div className="pt-4 border-t border-border dark:border-gray-700 space-y-3">
                   <a
-                    href={font.downloadUrl}
+                    href={activeVariant.downloadUrl || font.downloadUrl}
                     download
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >

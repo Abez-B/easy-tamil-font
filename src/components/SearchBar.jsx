@@ -23,7 +23,7 @@ export default function SearchBar({
             placeholder="Search by name, description or tag…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field pl-10"
+            className="input-field !pl-10"
             autoComplete="off"
           />
         </div>
@@ -35,7 +35,7 @@ export default function SearchBar({
             id="font-category"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="input-field pl-10 appearance-none cursor-pointer"
+            className="input-field !pl-10 appearance-none cursor-pointer"
           >
             <option value="all">All Categories</option>
             {categories.map((cat) => (

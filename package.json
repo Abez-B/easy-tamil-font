@@ -14,12 +14,11 @@
   "dependencies": {
     "@netlify/functions": "^5.2.0",
     "@netlify/vite-plugin": "^2.12.1",
-    "@piraisoodan/tanglish": "^0.1.2",
     "lucide-react": "^1.12.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
-    "tamil-romanizer": "^1.0.2"
+    "react-virtuoso": "^4.18.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

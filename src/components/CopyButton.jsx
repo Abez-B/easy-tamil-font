@@ -1,14 +1,21 @@
 import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 
-export default function CopyButton({ text, fontName }) {
+export default function CopyButton({ text, fontName, fontSize = 24, fontWeight = 'normal', fontStyle = 'normal' }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // fallback for older browsers
+      const htmlContent = `<span style="font-family: '${fontName}'; font-size: ${fontSize}px; font-weight: ${fontWeight}; font-style: ${fontStyle};">${text.replace(/\n/g, '<br>')}</span>`;
+      
+      // Use modern Clipboard API to write both plain text and HTML
+      const clipboardItem = new ClipboardItem({
+        'text/plain': new Blob([text], { type: 'text/plain' }),
+        'text/html': new Blob([htmlContent], { type: 'text/html' })
+      });
+      await navigator.clipboard.write([clipboardItem]);
+    } catch (err) {
+      // Fallback for older browsers (only copies plain text)
       const el = document.createElement('textarea');
       el.value = text;
       el.style.position = 'fixed';

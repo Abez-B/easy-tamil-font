@@ -2,44 +2,10 @@ import { useState, useEffect } from 'react';
 
 const BASE = import.meta.env.BASE_URL;
 const FONTS_URL = `${BASE}meta/fonts.json`;
-const FONT_FACES_STYLE_ID = 'easy-font-tamil-faces';
 
 // Module-level cache shared across all hook instances
 let cachedData = null;
 let fetchPromise = null;
-
-/**
- * Injects a single <style> tag containing @font-face rules for EVERY font.
- *
- * This is called synchronously inside fetchFontsData() — before loading is set
- * to false, before any FontCard renders. When the browser then encounters
- * `font-family: "TAU-Barathi"` on a card element, it already knows the src URL
- * and immediately starts downloading the file. No JavaScript-driven repaint
- * tricks needed; the browser's native font-display pipeline handles everything.
- *
- * font-display: swap → show fallback text instantly, swap to Tamil font when ready.
- */
-function injectFontFaces(fonts) {
-  if (document.getElementById(FONT_FACES_STYLE_ID)) return; // already injected
-
-  const rules = fonts
-    .filter((f) => f.downloadUrl)
-    .map((f) => {
-      // If downloadUrl is already absolute (http/https), use it directly.
-      // Otherwise prefix with BASE as before.
-      const isAbsolute = /^https?:\/\//.test(f.downloadUrl);
-      const url = isAbsolute
-        ? f.downloadUrl
-        : `${BASE}${f.downloadUrl.replace(/^\//, '')}?v=3`;
-      return `@font-face {\n  font-family: "${f.name}";\n  src: url("${url}") format("truetype");\n  font-display: swap;\n}`;
-    })
-    .join('\n\n');
-
-  const style = document.createElement('style');
-  style.id = FONT_FACES_STYLE_ID;
-  style.textContent = rules;
-  document.head.appendChild(style);
-}
 
 async function fetchFontsData() {
   if (cachedData) return cachedData;
@@ -51,22 +17,72 @@ async function fetchFontsData() {
         return res.json();
       })
       .then((data) => {
-        // Derive categories dynamically
+        // Derive categories, licenses, and collections dynamically
         const categoryMap = {};
+        const licenseSet = new Set();
+        const collectionSet = new Set();
+        const groupedFontsMap = {};
+
         for (const font of data.fonts) {
+          let baseName = font.name.replace(/^ATM\b/i, 'Heritage');
+          let variantName = 'Regular';
+          
+          const parts = baseName.split(' ');
+          const lastPart = parts[parts.length - 1];
+          if (/^(Bold|Italic|BoldItalic|Regular)$/i.test(lastPart)) {
+             variantName = lastPart;
+             parts.pop();
+             baseName = parts.join(' ');
+          } else if (/^\d$/.test(lastPart) && parts.length > 1) { 
+             variantName = `Style ${lastPart}`;
+             parts.pop();
+             baseName = parts.join(' ');
+          }
+          
+          if (!groupedFontsMap[baseName]) {
+             groupedFontsMap[baseName] = {
+                ...font,
+                name: baseName,
+                id: baseName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                variantsList: [],
+                randomWeight: Math.random()
+             };
+          }
+          
+          groupedFontsMap[baseName].variantsList.push({
+             variantName,
+             originalName: font.name,
+             downloadUrl: font.downloadUrl,
+             fontFamily: font.name,
+             id: font.id
+          });
+        }
+        
+        const groupedFonts = Object.values(groupedFontsMap).map(f => {
+           f.variantsList.sort((a, b) => {
+              if (a.variantName === 'Regular') return -1;
+              if (b.variantName === 'Regular') return 1;
+              return a.variantName.localeCompare(b.variantName);
+           });
+           return f;
+        });
+
+        for (const font of groupedFonts) {
           categoryMap[font.category] = (categoryMap[font.category] || 0) + 1;
+          if (font.license) licenseSet.add(font.license);
+          if (font.collection) collectionSet.add(font.collection);
         }
 
         cachedData = {
           ...data,
+          fonts: groupedFonts,
           categories: Object.entries(categoryMap).map(([name, count]) => ({
             name,
             count,
           })),
+          licenses: Array.from(licenseSet).sort(),
+          collections: Array.from(collectionSet).sort(),
         };
-
-        // Inject ALL font faces before any component reads loading:false
-        injectFontFaces(data.fonts);
 
         return cachedData;
       })
@@ -82,16 +98,14 @@ async function fetchFontsData() {
 /**
  * Fetches font metadata from public/meta/fonts.json at runtime.
  *
- * On successful load it immediately injects @font-face rules for every font
- * so that when FontCard/FontPreview components render, the browser already
- * has all src URLs registered and can download + swap fonts natively.
- *
- * @returns {{ fonts, categories, metadata, loading, error }}
+ * @returns {{ fonts, categories, licenses, collections, metadata, loading, error }}
  */
 export function useFontsData() {
   const [state, setState] = useState({
     fonts: [],
     categories: [],
+    licenses: [],
+    collections: [],
     metadata: null,
     loading: true,
     error: null,
@@ -106,6 +120,8 @@ export function useFontsData() {
           setState({
             fonts: data.fonts,
             categories: data.categories,
+            licenses: data.licenses,
+            collections: data.collections,
             metadata: data.metadata,
             loading: false,
             error: null,

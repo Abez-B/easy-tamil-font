@@ -11,14 +11,13 @@ export default function Header({ darkMode, setDarkMode }) {
     { to: '/', label: 'Home', exact: true },
     { to: '/license', label: 'License' },
     { to: '/contributing', label: 'Contributing' },
-    { to: '/tools', label: 'Tools' },
   ];
 
   const linkClass = ({ isActive }) =>
     `transition-colors ${isActive ? 'text-primary dark:text-white font-semibold' : 'text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-white'}`;
 
   return (
-    <header className="sticky top-0 z-50 bg-bg dark:bg-black border-b border-border backdrop-blur-sm">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-black/80 border-b border-border backdrop-blur-md transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

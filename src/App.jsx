@@ -7,7 +7,6 @@ import Home from './pages/Home';
 import FontDetail from './pages/FontDetail';
 import License from './pages/License';
 import Contributing from './pages/Contributing';
-import Tools from './pages/Tools';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -39,7 +38,6 @@ function App() {
             <Route path="/font/:id" element={<FontDetail />} />
             <Route path="/license" element={<License />} />
             <Route path="/contributing" element={<Contributing />} />
-            <Route path="/tools" element={<Tools />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

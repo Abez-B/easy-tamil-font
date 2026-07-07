@@ -46,7 +46,7 @@ Add an entry to `public/meta/fonts.json`:
 }
 ```
 
-**Important**: Also update `src/data/fonts.json` with the same entry.
+**Important**: Make sure all variants are listed inside the `variantsList` array if using the new grouped structure.
 
 ### Step 5: Commit and Push
 ```bash
@@ -102,7 +102,7 @@ Before submitting your PR:
 
 ## Questions or Issues?
 
-If you have questions or encounter issues while contributing, please open an [issue on GitHub](https://github.com/your-repo/issues). We're happy to help!
+If you have questions or encounter issues while contributing, please open an [issue on GitHub](https://github.com/Abez-B/easy-tamil-font/issues). We're happy to help!
 
 ## Code of Conduct
 
