@@ -29,6 +29,7 @@ export default function Home() {
 
   const [currentHeroFontIndex, setCurrentHeroFontIndex] = useState(0);
   const [firstFontLoaded, setFirstFontLoaded] = useState(false);
+  const [heroOpacity, setHeroOpacity] = useState(1);
 
   useEffect(() => {
     if (heroFonts.length === 0) return;
@@ -69,7 +70,14 @@ export default function Home() {
   useEffect(() => {
     if (heroFonts.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentHeroFontIndex((prev) => (prev + 1) % heroFonts.length);
+      // 1. Fade out the text smoothly
+      setHeroOpacity(0);
+      
+      // 2. Swop the font family and fade back in after 300ms (matching CSS transition duration)
+      setTimeout(() => {
+        setCurrentHeroFontIndex((prev) => (prev + 1) % heroFonts.length);
+        setHeroOpacity(1);
+      }, 300);
     }, 2000);
     return () => clearInterval(interval);
   }, [heroFonts]);
@@ -129,20 +137,21 @@ export default function Home() {
           <div className="max-w-2xl">
             {/* Large decorative Tamil text with gradient */}
             <div 
-              className={`flex flex-col -space-y-2 md:-space-y-6 mb-4 transition-opacity duration-500 ${
-                firstFontLoaded ? 'opacity-100' : 'opacity-0'
+              className={`flex flex-col -space-y-2 md:-space-y-6 mb-4 transition-all duration-300 ease-in-out ${
+                firstFontLoaded && heroOpacity === 1 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-1 scale-[0.985]'
               }`}
               aria-hidden="true" 
-              key={currentHeroFontIndex}
             >
               <div
-                className="text-[45px] md:text-6xl font-bold leading-[1.3] md:leading-[1.8] py-2 px-2 tracking-[0.08em] text-gradient animate-fade-in"
+                className="text-[45px] md:text-6xl font-bold leading-[1.3] md:leading-[1.8] py-2 px-2 tracking-[0.08em] text-gradient"
                 style={{ fontFamily: `"${activeHeroFontName}", system-ui` }}
               >
                 தமிழ்
               </div>
               <div
-                className="text-[45px] md:text-6xl font-bold leading-[1.3] md:leading-[1.8] py-2 px-2 tracking-[0.08em] text-gradient animate-fade-in"
+                className="text-[45px] md:text-6xl font-bold leading-[1.3] md:leading-[1.8] py-2 px-2 tracking-[0.08em] text-gradient"
                 style={{ fontFamily: `"${activeHeroFontName}", system-ui` }}
               >
                 எழுத்துருக்கள்
