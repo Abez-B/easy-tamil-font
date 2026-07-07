@@ -144,21 +144,6 @@ See [LICENSE](LICENSE) for full details.
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
 
-## 🔮 Roadmap
-
-### Phase 1 (Current)
-- ✅ Font gallery and preview
-- ✅ Font detail pages
-- ✅ Search and filter
-- ✅ Copy rendered text
-- ✅ License information
-- ✅ Contributing guide
-
-### Phase 2 (Upcoming)
-- 🚧 Unicode Converter (TSCII/ISCII → Unicode)
-- 🚧 Transliterator (Tanglish → Tamil)
-- 🚧 Translator (Any language → Tamil)
-
 ## 📞 Contact
 
 - **Tamil Virtual Academy**: [tamilvu@yahoo.com](mailto:tamilvu@yahoo.com)
