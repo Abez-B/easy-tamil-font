@@ -18,15 +18,15 @@ export default function Header({ darkMode, setDarkMode }) {
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-black/80 border-b border-border backdrop-blur-md transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group" onClick={() => setMobileOpen(false)}>
+          <Link to="/" className="flex items-center gap-3.5 group" onClick={() => setMobileOpen(false)}>
             <img
               src={faviconUrl}
               alt="ezhuthurukal logo"
-              className="h-9 w-9 md:h-10 md:w-10 object-contain transition-all duration-300 group-hover:scale-105"
+              className="h-11 w-11 md:h-13 md:w-13 object-contain transition-all duration-300 group-hover:scale-105"
             />
-            <span className="font-heading font-bold text-xl md:text-2xl tracking-tight text-primary dark:text-white transition-colors duration-300">
+            <span className="font-heading font-extrabold text-2xl md:text-3xl tracking-tight text-primary dark:text-white transition-colors duration-300">
               ezhuthurukal
             </span>
           </Link>
