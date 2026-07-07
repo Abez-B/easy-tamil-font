@@ -27,8 +27,13 @@ export default function Home() {
     return [...unicodeFonts].sort(() => 0.5 - Math.random()).slice(0, 35);
   }, [fonts]);
 
+  const [currentHeroFontIndex, setCurrentHeroFontIndex] = useState(0);
+  const [firstFontLoaded, setFirstFontLoaded] = useState(false);
+
   useEffect(() => {
-    // Dynamically inject @font-face for the hero fonts so they are preloaded
+    if (heroFonts.length === 0) return;
+
+    // Dynamically inject @font-face for the hero fonts so they are registered in the DOM
     heroFonts.forEach(font => {
       const fontName = font.name;
       const id = `hero-font-${fontName.replace(/\s+/g, '-')}`;
@@ -45,9 +50,21 @@ export default function Home() {
         document.head.appendChild(style);
       }
     });
-  }, [heroFonts]);
 
-  const [currentHeroFontIndex, setCurrentHeroFontIndex] = useState(0);
+    // Programmatically load the first font and fade it in once ready
+    document.fonts.load(`1em "${heroFonts[0].name}"`)
+      .then(() => {
+        setFirstFontLoaded(true);
+      })
+      .catch(() => {
+        setFirstFontLoaded(true); // Fallback if load fails
+      });
+
+    // Preload all other hero fonts in the background so they transition instantly
+    heroFonts.slice(1).forEach(font => {
+      document.fonts.load(`1em "${font.name}"`);
+    });
+  }, [heroFonts]);
 
   useEffect(() => {
     if (heroFonts.length === 0) return;
@@ -111,7 +128,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-18 relative z-10">
           <div className="max-w-2xl">
             {/* Large decorative Tamil text with gradient */}
-            <div className="flex flex-col -space-y-2 md:-space-y-6 mb-4" aria-hidden="true" key={currentHeroFontIndex}>
+            <div 
+              className={`flex flex-col -space-y-2 md:-space-y-6 mb-4 transition-opacity duration-500 ${
+                firstFontLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              aria-hidden="true" 
+              key={currentHeroFontIndex}
+            >
               <div
                 className="text-[45px] md:text-6xl font-bold leading-[1.3] md:leading-[1.8] py-2 px-2 tracking-[0.08em] text-gradient animate-fade-in"
                 style={{ fontFamily: `"${activeHeroFontName}", system-ui` }}
