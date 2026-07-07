@@ -11,7 +11,7 @@ export default function Contributing() {
         </Link>
 
         <div className="bg-bg-secondary rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-primary mb-6">Contributing to easy-font-tamil</h1>
+          <h1 className="text-3xl font-bold text-primary mb-6">Contributing to ezhuthurukal</h1>
           
           <div className="space-y-6 text-text">
             <section>
@@ -42,7 +42,7 @@ export default function Contributing() {
                     <h3 className="font-semibold text-primary mb-1">Clone Locally</h3>
                     <p className="text-text-secondary mb-2">Clone your fork to your local machine:</p>
                     <code className="block bg-bg p-3 rounded text-sm overflow-x-auto">
-                      git clone https://github.com/YOUR_USERNAME/easy-font-tamil.git
+                      git clone https://github.com/YOUR_USERNAME/ezhuthurukal.git
                     </code>
                   </div>
                 </div>

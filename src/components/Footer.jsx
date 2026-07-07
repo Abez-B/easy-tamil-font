@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-semibold text-primary dark:text-white mb-2">easy-font-tamil</h3>
+            <h3 className="font-semibold text-primary dark:text-white mb-2">ezhuthurukal</h3>
             <p className="text-sm text-text-secondary dark:text-gray-300">
               A community-driven Tamil font showcase and indexing platform.
             </p>
@@ -61,7 +61,7 @@ export default function Footer() {
         </div>
         
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-text-secondary dark:text-gray-400">
-          <p>© 2026 easy-font-tamil. Fonts are exclusively for educational and research purposes.</p>
+          <p>© 2026 ezhuthurukal. Fonts are exclusively for educational and research purposes.</p>
         </div>
       </div>
     </footer>

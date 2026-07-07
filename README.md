@@ -1,10 +1,10 @@
-# easy-font-tamil
+# ezhuthurukal
 
 A minimal, community-driven Tamil font showcase and indexing platform. Browse, preview, and download Tamil fonts with ease.
 
 ## 🎯 Purpose
 
-easy-font-tamil is designed to:
+ezhuthurukal is designed to:
 - **Discover** Tamil fonts in one centralized location
 - **Preview** fonts with live text rendering
 - **Download** fonts for educational and research use
@@ -30,7 +30,7 @@ easy-font-tamil is designed to:
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd easy-font-tamil
+   cd ezhuthurukal
    ```
 
 2. **Install dependencies**
@@ -80,12 +80,12 @@ The built files will be in the `dist` folder.
    - Go to your repository settings
    - Navigate to "Pages"
    - Select the `gh-pages` branch
-   - Your site will be available at `https://<username>.github.io/easy-font-tamil`
+   - Your site will be available at `https://<username>.github.io/ezhuthurukal`
 
 ## 📁 Project Structure
 
 ```
-easy-font-tamil/
+ezhuthurukal/
 ├── public/
 │   ├── fonts/              # Font files (.ttf, .otf)
 │   │   ├── tau-barathi/

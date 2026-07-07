@@ -25,13 +25,13 @@ export default function Header({ darkMode, setDarkMode }) {
             {/* Full landscape logo — desktop only */}
             <img
               src={logoUrl}
-              alt="easy-font-tamil"
+              alt="ezhuthurukal"
               className="hidden md:block h-14 w-auto object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
             />
             {/* Square favicon — mobile only */}
             <img
               src={faviconUrl}
-              alt="easy-font-tamil"
+              alt="ezhuthurukal"
               className="block md:hidden h-11 w-11 object-contain transition-all duration-300 dark:invert dark:hue-rotate-180 group-hover:scale-105"
             />
           </Link>

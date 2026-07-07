@@ -1,4 +1,4 @@
-# Contributing to easy-font-tamil
+# Contributing to ezhuthurukal
 
 We welcome contributions from the community! This project aims to be a comprehensive showcase of Tamil fonts. You can help by adding new fonts, improving metadata, or suggesting enhancements.
 
@@ -10,8 +10,8 @@ Click the "Fork" button on GitHub to create your own copy of the repository.
 ### Step 2: Clone Locally
 Clone your fork to your local machine:
 ```bash
-git clone https://github.com/YOUR_USERNAME/easy-font-tamil.git
-cd easy-font-tamil
+git clone https://github.com/YOUR_USERNAME/ezhuthurukal.git
+cd ezhuthurukal
 ```
 
 ### Step 3: Add Font Files
@@ -111,4 +111,4 @@ If you have questions or encounter issues while contributing, please open an [is
 - Welcome newcomers to the project
 - Focus on improving the project for everyone
 
-Thank you for contributing to easy-font-tamil! 🙏
+Thank you for contributing to ezhuthurukal! 🙏
