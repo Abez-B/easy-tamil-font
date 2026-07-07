@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import faviconUrl from '../assets/ezhuthurukal-favicon.png';
-import logoUrl from '../assets/ezhuthurukal-logo.png';
 
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -21,19 +20,15 @@ export default function Header({ darkMode, setDarkMode }) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center group" onClick={() => setMobileOpen(false)}>
-            {/* Full landscape logo — desktop only */}
-            <img
-              src={logoUrl}
-              alt="ezhuthurukal"
-              className="hidden md:block h-14 w-auto object-contain transition-all duration-300 group-hover:scale-105"
-            />
-            {/* Square favicon — mobile only */}
+          <Link to="/" className="flex items-center gap-2.5 group" onClick={() => setMobileOpen(false)}>
             <img
               src={faviconUrl}
-              alt="ezhuthurukal"
-              className="block md:hidden h-11 w-11 object-contain transition-all duration-300 group-hover:scale-105"
+              alt="ezhuthurukal logo"
+              className="h-9 w-9 md:h-10 md:w-10 object-contain transition-all duration-300 group-hover:scale-105"
             />
+            <span className="font-heading font-bold text-xl md:text-2xl tracking-tight text-primary dark:text-white transition-colors duration-300">
+              ezhuthurukal
+            </span>
           </Link>
 
           {/* Desktop nav */}
