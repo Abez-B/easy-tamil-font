@@ -31,3 +31,7 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+# Local tools
+.wrangler/
+.venv/

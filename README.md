@@ -1,5 +1,9 @@
-# ezhuthurukal
+# Ezhuthurukal
 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 A minimal, community-driven Tamil font showcase and indexing platform. Browse, preview, and download Tamil fonts with ease.
 
 ## 🎯 Purpose
@@ -135,7 +139,7 @@ All fonts on this site are **exclusively for educational and research purposes**
 - **License**: Free for educational and research use
 - **Commercial Use**: Contact font creators directly
 
-See [LICENSE](LICENSE) for full details.
+See [FONTS_LICENSE.md](FONTS_LICENSE.md) for full details.
 
 ## 🎨 Design
 
@@ -155,9 +159,12 @@ See [LICENSE](LICENSE) for full details.
 - **Framework**: React, Vite, Tailwind CSS
 - **Icons**: Lucide React
 
-## 📜 License
+## 📜 Licensing
 
-This project is open source. Fonts are provided for educational and research purposes only. See [LICENSE](LICENSE) for details.
+This repository uses a **Dual-License** model:
+
+1. **Source Code (MIT License):** The web application code, UI components, and logic are open source under the [MIT License](LICENSE).
+2. **Font Files (Educational Use):** The Tamil fonts hosted in the `public/fonts/` directory are provided by the Tamil Virtual Academy and are strictly for educational and research purposes. See [FONTS_LICENSE.md](FONTS_LICENSE.md) for detailed font usage guidelines.
 
 ---
 
