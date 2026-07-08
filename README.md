@@ -4,6 +4,7 @@
 ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+
 A minimal, community-driven Tamil font showcase and indexing platform. Browse, preview, and download Tamil fonts with ease.
 
 ## 🎯 Purpose
